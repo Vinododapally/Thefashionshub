@@ -1,0 +1,1080 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Launch your online store in days — multi-shop e-commerce with UPI payments</title>
+<meta name="description" content="A complete, mobile-first e-commerce platform. Create branded online shops with their own logo, domain, categories and payments (UPI, cards, net banking, COD). Switch features on or off per customer.">
+<meta property="og:title" content="Launch your online store in days — not months">
+<meta property="og:description" content="Branded shops, UPI & card payments, powerful admin, and feature switches per customer. One platform. Unlimited shops.">
+<meta property="og:type" content="website">
+<meta name="theme-color" content="#0b0b1e">
+<script>
+/* Colour-theme picker built into this page.
+ *  - applies a palette by setting CSS variables on <html>
+ *  - remembers the visitor's choice (localStorage) and supports  ?theme=ocean  in the address
+ *  - injects the floating "Theme" button + panel (no markup needed in the pages)
+ * Add a theme by adding one entry to THEMES below.
+ */
+(function () {
+  "use strict";
+
+  // pink/purple/blue are the page's primary / secondary / third accent colours (names kept for the stylesheet).
+  var THEMES = {
+    sunset:  { name: "Sunset",  pink: "#ff3f6c", purple: "#7b2ff7", blue: "#2563eb", ink: "#0b0b1e", ink3: "#07071a", glow: "#4f2bff", t1: "#ff7a9c", t2: "#c68bff", t3: "#7fb0ff", tint: "#f3efff", tint2: "#f6f3ff", bg: "#fbfaff", line: "#e8e6f3", edge: "#d9c9ff" },
+    ocean:   { name: "Ocean",   pink: "#0ea5e9", purple: "#2563eb", blue: "#06b6d4", ink: "#06142b", ink3: "#040d1d", glow: "#1d4ed8", t1: "#7dd3fc", t2: "#93c5fd", t3: "#67e8f9", tint: "#e8f3ff", tint2: "#eff7ff", bg: "#f6fbff", line: "#dce9f6", edge: "#b6d4f5" },
+    emerald: { name: "Emerald", pink: "#10b981", purple: "#059669", blue: "#84cc16", ink: "#03201a", ink3: "#021611", glow: "#047857", t1: "#6ee7b7", t2: "#a7f3d0", t3: "#d9f99d", tint: "#e6f9f1", tint2: "#eefbf5", bg: "#f5fffb", line: "#d7eee4", edge: "#a7e3c8" },
+    sunrise: { name: "Sunrise", pink: "#f59e0b", purple: "#ef4444", blue: "#f97316", ink: "#1f0e04", ink3: "#150a03", glow: "#b45309", t1: "#fcd34d", t2: "#fdba74", t3: "#fca5a5", tint: "#fff3e0", tint2: "#fff7ea", bg: "#fffaf3", line: "#f3e5d2", edge: "#f9cf9b" },
+    royal:   { name: "Royal",   pink: "#6366f1", purple: "#a855f7", blue: "#ec4899", ink: "#0c0a2a", ink3: "#07061c", glow: "#4338ca", t1: "#a5b4fc", t2: "#d8b4fe", t3: "#f9a8d4", tint: "#eeeeff", tint2: "#f3f3ff", bg: "#fafaff", line: "#e5e5f6", edge: "#c7c9fb" },
+    berry:   { name: "Berry",   pink: "#e11d48", purple: "#a21caf", blue: "#7c3aed", ink: "#1a0614", ink3: "#12040e", glow: "#9d174d", t1: "#fda4af", t2: "#f0abfc", t3: "#c4b5fd", tint: "#fde9f1", tint2: "#fdf0f6", bg: "#fff8fb", line: "#f3dce6", edge: "#f4b8d1" }
+  };
+  var KEY = "marketing_theme";
+
+  function rgb(hex) {
+    var n = parseInt(hex.slice(1), 16);
+    return ((n >> 16) & 255) + " " + ((n >> 8) & 255) + " " + (n & 255);
+  }
+  function store(v) { try { if (v === undefined) return localStorage.getItem(KEY); localStorage.setItem(KEY, v); } catch (e) { /* storage blocked */ } return null; }
+  function fromUrl() { try { return new URLSearchParams(location.search).get("theme"); } catch (e) { return null; } }
+
+  function apply(id) {
+    var t = THEMES[id] || THEMES.sunset;
+    id = THEMES[id] ? id : "sunset";
+    var s = document.documentElement.style;
+    var map = { "--pink": t.pink, "--purple": t.purple, "--blue": t.blue, "--ink": t.ink, "--ink-3": t.ink3, "--glow": t.glow, "--t1": t.t1, "--t2": t.t2, "--t3": t.t3, "--tint": t.tint, "--tint-2": t.tint2, "--bg": t.bg, "--line": t.line, "--edge": t.edge };
+    for (var k in map) s.setProperty(k, map[k]);
+    s.setProperty("--pink-rgb", rgb(t.pink));
+    s.setProperty("--purple-rgb", rgb(t.purple));
+    s.setProperty("--blue-rgb", rgb(t.blue));
+    s.setProperty("--glow-rgb", rgb(t.glow));
+    document.documentElement.setAttribute("data-theme", id);
+    var meta = document.querySelector('meta[name="theme-color"]');
+    if (meta) meta.setAttribute("content", t.ink);
+    return id;
+  }
+
+  var current = fromUrl() && THEMES[fromUrl()] ? fromUrl() : (store() && THEMES[store()] ? store() : "sunset");
+  apply(current);
+  if (fromUrl() && THEMES[fromUrl()]) store(current);
+
+  window.MarketingTheme = { themes: THEMES, apply: function (id) { current = apply(id); store(current); refresh(); try { document.dispatchEvent(new CustomEvent("themechange", { detail: current })); } catch (e) { /* old browser */ } return current; }, current: function () { return current; } };
+
+  /* ------------------------------------------------ picker UI */
+  var panel, btn;
+  function refresh() {
+    if (!panel) return;
+    [].forEach.call(panel.querySelectorAll("button[data-t]"), function (b) {
+      var on = b.getAttribute("data-t") === current;
+      b.setAttribute("aria-pressed", on ? "true" : "false");
+      b.classList.toggle("on", on);
+    });
+  }
+
+  function build() {
+    var css = document.createElement("style");
+    css.textContent =
+      ".tp{position:fixed;right:18px;bottom:18px;z-index:300;font-family:inherit}" +
+      ".tp-btn{width:56px;height:56px;border-radius:50%;background:var(--grad,linear-gradient(120deg,var(--pink),var(--purple)));color:#fff;display:grid;place-items:center;box-shadow:0 14px 34px -8px rgb(var(--pink-rgb)/.65),0 0 0 4px rgba(255,255,255,.9);transition:transform .25s;border:0;cursor:pointer}" +
+      ".tp-btn:hover{transform:scale(1.08) rotate(-8deg)}.tp-btn svg{width:26px;height:26px;stroke:#fff;fill:none;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}" +
+      ".tp-panel{position:absolute;right:0;bottom:70px;width:268px;background:#fff;color:#1b1b2f;border:1px solid var(--line);border-radius:20px;padding:16px;box-shadow:0 30px 70px -20px rgba(20,10,60,.5);opacity:0;transform:translateY(12px) scale(.97);pointer-events:none;transition:opacity .2s,transform .2s}" +
+      ".tp.open .tp-panel{opacity:1;transform:none;pointer-events:auto}" +
+      ".tp-panel h4{font-size:.95rem;margin:0 0 2px}.tp-panel p{font-size:.78rem;color:#6b6b85;margin:0 0 12px}" +
+      ".tp-list{display:grid;grid-template-columns:1fr 1fr;gap:8px}" +
+      ".tp-opt{display:flex;align-items:center;gap:9px;padding:9px 10px;border-radius:12px;border:1.5px solid var(--line);background:#fff;font:inherit;font-size:.82rem;font-weight:700;color:#1b1b2f;cursor:pointer;text-align:left;transition:border-color .2s,background .2s,transform .2s}" +
+      ".tp-opt:hover{transform:translateY(-2px);border-color:var(--edge)}.tp-opt.on{border-color:var(--pink);background:rgb(var(--pink-rgb)/.07)}" +
+      ".tp-dot{width:26px;height:26px;border-radius:50%;flex:none;box-shadow:inset 0 0 0 2px rgba(255,255,255,.7)}" +
+      "@media(max-width:560px){.tp{right:12px;bottom:12px}.tp-btn{width:50px;height:50px}.tp-panel{width:min(268px,calc(100vw - 32px))}}" +
+      "@media print{.tp{display:none}}";
+    document.head.appendChild(css);
+
+    var wrap = document.createElement("div");
+    wrap.className = "tp";
+    wrap.innerHTML =
+      '<div class="tp-panel" id="tpPanel" role="dialog" aria-label="Choose a colour theme"><h4>Colour theme</h4><p>Pick the look you like - it is saved for next time.</p><div class="tp-list"></div></div>' +
+      '<button class="tp-btn" type="button" aria-label="Change colour theme" aria-expanded="false" aria-controls="tpPanel">' +
+      '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3a9 9 0 1 0 0 18c1.4 0 2-1 1.6-2-.5-1.2.2-2.5 1.6-2.5H17a4 4 0 0 0 4-4A9 9 0 0 0 12 3z"/><circle cx="7.5" cy="11" r="1.1"/><circle cx="10" cy="7.2" r="1.1"/><circle cx="15" cy="7.2" r="1.1"/></svg></button>';
+    document.body.appendChild(wrap);
+    panel = wrap.querySelector(".tp-panel");
+    btn = wrap.querySelector(".tp-btn");
+    var list = wrap.querySelector(".tp-list");
+    Object.keys(THEMES).forEach(function (id) {
+      var t = THEMES[id], b = document.createElement("button");
+      b.type = "button"; b.className = "tp-opt"; b.setAttribute("data-t", id); b.setAttribute("aria-pressed", "false");
+      b.innerHTML = '<span class="tp-dot" style="background:linear-gradient(135deg,' + t.pink + ',' + t.purple + ')"></span>' + t.name;
+      b.addEventListener("click", function () { window.MarketingTheme.apply(id); });
+      list.appendChild(b);
+    });
+    function toggle(open) { wrap.classList.toggle("open", open); btn.setAttribute("aria-expanded", open ? "true" : "false"); }
+    btn.addEventListener("click", function (e) { e.stopPropagation(); toggle(!wrap.classList.contains("open")); });
+    document.addEventListener("click", function (e) { if (!wrap.contains(e.target)) toggle(false); });
+    document.addEventListener("keydown", function (e) { if (e.key === "Escape") { toggle(false); btn.focus(); } });
+    refresh();
+  }
+
+  if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", build); else build();
+})();
+
+</script>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0' stop-color='%23ff3f6c'/%3E%3Cstop offset='1' stop-color='%237b2ff7'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='64' height='64' rx='16' fill='url(%23g)'/%3E%3Cpath d='M20 24h24l-3 20H23z' fill='none' stroke='white' stroke-width='4' stroke-linejoin='round'/%3E%3Cpath d='M26 24c0-8 12-8 12 0' fill='none' stroke='white' stroke-width='4' stroke-linecap='round'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+<style>
+:root{
+  --ink:#0b0b1e; --ink-2:#14143a; --text:#1b1b2f; --muted:#6b6b85; --line:#e8e6f3; --bg:#fbfaff; --card:#fff;
+  --whatsapp:#25d366; --pink:#ff3f6c; --purple:#7b2ff7; --blue:#2563eb; --cyan:#06b6d4; --yellow:#ffc233; --green:#10b981;
+  --ink-3:#07071a; --glow:#4f2bff; --t1:#ff7a9c; --t2:#c68bff; --t3:#7fb0ff; --tint:#f3efff; --tint-2:#f6f3ff; --edge:#d9c9ff;
+  --pink-rgb:255 63 108; --purple-rgb:123 47 247; --blue-rgb:37 99 235; --glow-rgb:79 43 255;
+  --grad:linear-gradient(120deg,var(--pink) 0%,var(--purple) 55%,var(--blue) 100%);
+  --grad-soft:linear-gradient(135deg,rgb(var(--pink-rgb) / .12),rgb(var(--purple-rgb) / .12));
+  --radius:22px; --shadow:0 20px 60px -20px rgba(36,20,90,.35);
+  --font:"Plus Jakarta Sans",system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth;-webkit-text-size-adjust:100%}
+body{font-family:var(--font);color:var(--text);background:var(--bg);line-height:1.6;overflow-x:hidden}
+img,svg{display:block;max-width:100%}
+a{color:inherit;text-decoration:none}
+button{font:inherit;cursor:pointer;border:0;background:none;color:inherit}
+.wrap{width:min(1180px,100% - 40px);margin-inline:auto}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+.icon{width:24px;height:24px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+
+/* ---------- buttons ---------- */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:10px;padding:15px 26px;border-radius:14px;font-weight:700;font-size:1rem;transition:transform .2s,box-shadow .2s,background .2s;white-space:nowrap}
+.btn-primary{background:var(--grad);color:#fff;box-shadow:0 12px 30px -8px rgb(var(--pink-rgb) / .6)}
+.btn-primary:hover{transform:translateY(-3px);box-shadow:0 18px 38px -8px rgb(var(--pink-rgb) / .7)}
+.btn-ghost{border:1.5px solid rgba(255,255,255,.35);color:#fff;background:rgba(255,255,255,.06);backdrop-filter:blur(8px)}
+.btn-ghost:hover{background:rgba(255,255,255,.14);transform:translateY(-3px)}
+.btn-dark{background:var(--ink);color:#fff}
+.btn-dark:hover{transform:translateY(-3px);box-shadow:0 14px 30px -10px rgba(11,11,30,.6)}
+.btn-line{border:1.5px solid var(--line);background:#fff}
+.btn-line:hover{border-color:var(--purple);color:var(--purple);transform:translateY(-3px)}
+.btn-lg{padding:18px 32px;font-size:1.08rem;border-radius:16px}
+
+/* ---------- nav ---------- */
+.nav{position:fixed;inset:0 0 auto 0;z-index:100;transition:background .3s,box-shadow .3s,backdrop-filter .3s}
+.nav.solid{background:rgba(11,11,30,.88);backdrop-filter:blur(14px);box-shadow:0 8px 30px -12px rgba(0,0,0,.5)}
+.nav-in{display:flex;align-items:center;justify-content:space-between;height:74px;gap:20px}
+.brand{display:flex;align-items:center;gap:11px;font-weight:800;font-size:1.3rem;color:#fff;letter-spacing:-.3px}
+.brand .mark{width:38px;height:38px;border-radius:11px;background:var(--grad);display:grid;place-items:center;box-shadow:0 8px 20px -6px rgb(var(--pink-rgb) / .7)}
+.brand .mark svg{width:22px;height:22px;stroke:#fff;fill:none;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round}
+.links{display:flex;gap:30px;color:rgba(255,255,255,.78);font-weight:600;font-size:.95rem}
+.links a:hover{color:#fff}
+.nav .btn{padding:11px 20px;font-size:.92rem;border-radius:12px}
+@media(max-width:860px){.links{display:none}}
+
+/* ---------- hero ---------- */
+.hero{position:relative;background:var(--ink);color:#fff;padding:150px 0 120px;overflow:hidden;isolation:isolate}
+.hero::before,.hero::after{content:"";position:absolute;border-radius:50%;filter:blur(90px);z-index:-1;opacity:.75}
+.hero::before{width:620px;height:620px;background:var(--pink);top:-220px;left:-160px;opacity:.5}
+.hero::after{width:680px;height:680px;background:var(--glow);right:-200px;top:40px;opacity:.55}
+.grid-bg{position:absolute;inset:0;z-index:-1;background-image:linear-gradient(rgba(255,255,255,.05) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.05) 1px,transparent 1px);background-size:56px 56px;mask-image:radial-gradient(ellipse at 50% 30%,#000 30%,transparent 75%)}
+.hero-grid{display:grid;grid-template-columns:1.05fr .95fr;gap:50px;align-items:center}
+.pill{display:inline-flex;align-items:center;gap:9px;padding:8px 16px 8px 10px;border-radius:99px;background:rgba(255,255,255,.09);border:1px solid rgba(255,255,255,.18);font-size:.85rem;font-weight:600;backdrop-filter:blur(8px)}
+.pill b{background:var(--grad);padding:3px 10px;border-radius:99px;font-size:.72rem;letter-spacing:.5px}
+h1{font-size:clamp(2.3rem,4.5vw,3.9rem);line-height:1.06;letter-spacing:-.035em;font-weight:800;margin:22px 0 22px;text-wrap:balance}
+.grad-text{background:linear-gradient(100deg,var(--t1),var(--t2) 45%,var(--t3));-webkit-background-clip:text;background-clip:text;color:transparent}
+.lead{font-size:clamp(1.05rem,1.6vw,1.3rem);color:rgba(255,255,255,.76);max-width:34em}
+.cta-row{display:flex;gap:14px;flex-wrap:wrap;margin:34px 0 30px}
+.pay-row{display:flex;flex-wrap:wrap;gap:10px;align-items:center;color:rgba(255,255,255,.65);font-size:.85rem;font-weight:600}
+.pay-row span.chip{padding:6px 12px;border-radius:10px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.14);color:#fff}
+
+/* hero mockups */
+.stage{position:relative;height:560px}
+.browser,.phone .scr{color:var(--text)}
+.browser{position:absolute;right:0;top:20px;width:min(520px,100%);border-radius:18px;background:#fff;box-shadow:0 40px 80px -20px rgba(0,0,0,.7);overflow:hidden;transform:perspective(1200px) rotateY(-9deg) rotateX(3deg);transition:transform .6s}
+.stage:hover .browser{transform:perspective(1200px) rotateY(-3deg) rotateX(1deg)}
+.bar{display:flex;gap:7px;align-items:center;padding:12px 16px;background:#f2f0fa}
+.bar i{width:11px;height:11px;border-radius:50%;background:#ff6b6b}.bar i:nth-child(2){background:#ffc233}.bar i:nth-child(3){background:#3ddc97}
+.bar span{margin-left:14px;flex:1;background:#fff;border-radius:8px;padding:4px 12px;font-size:.72rem;color:#7a7a95}
+.shop-hero{background:linear-gradient(120deg,var(--pink),var(--purple));padding:26px 22px;color:#fff}
+.shop-hero small{opacity:.85;font-size:.68rem;letter-spacing:1px;font-weight:700}
+.shop-hero h4{font-size:1.5rem;line-height:1.15;margin:6px 0 12px;letter-spacing:-.02em}
+.shop-hero .mini-btn{display:inline-block;background:#ffc233;color:#1b1b2f;font-weight:800;font-size:.72rem;padding:8px 14px;border-radius:9px}
+.shop-cats{display:flex;gap:8px;padding:14px 18px 4px;overflow:hidden}
+.shop-cats span{font-size:.66rem;font-weight:700;padding:6px 11px;border-radius:99px;background:#f3f1fb;color:#4a4a6a;white-space:nowrap}
+.shop-prods{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;padding:10px 18px 18px}
+.sp{border-radius:12px;background:#faf9ff;border:1px solid #eeeaf9;overflow:hidden}
+.sp .ph{height:86px;display:grid;place-items:center;font-size:2rem}
+.sp .ph.a{background:linear-gradient(135deg,#ffd1dc,#ffeaf0)}.sp .ph.b{background:linear-gradient(135deg,#cfe0ff,#e8f0ff)}.sp .ph.c{background:linear-gradient(135deg,#d6f5e6,#eefbf4)}
+.sp div.t{padding:7px 8px 9px;font-size:.62rem;font-weight:700;color:#2a2a45;line-height:1.3}
+.sp div.t b{display:block;color:var(--pink);font-size:.7rem;margin-top:2px}
+.phone{position:absolute;left:0;bottom:0;width:230px;border-radius:34px;background:#0e0e24;padding:10px;box-shadow:0 40px 70px -20px rgba(0,0,0,.8),inset 0 0 0 2px #2c2c55;transform:rotate(-5deg);transition:transform .6s;animation:float 6s ease-in-out infinite}
+.stage:hover .phone{transform:rotate(-2deg) translateY(-6px)}
+.phone .scr{border-radius:26px;background:#fff;overflow:hidden;height:420px;position:relative}
+.phone .notch{position:absolute;top:8px;left:50%;transform:translateX(-50%);width:70px;height:16px;border-radius:12px;background:#0e0e24;z-index:3}
+.ph-head{background:linear-gradient(120deg,#2563eb,#06b6d4);color:#fff;padding:32px 14px 14px;font-weight:800;font-size:.9rem}
+.ph-head small{display:block;font-weight:600;opacity:.85;font-size:.6rem;margin-top:2px}
+.ph-card{margin:10px 12px;border-radius:14px;background:#f7f6fd;padding:10px;display:flex;gap:10px;align-items:center;font-size:.64rem;font-weight:700}
+.ph-card .im{width:46px;height:56px;border-radius:9px;display:grid;place-items:center;font-size:1.4rem;background:linear-gradient(135deg,#cfe0ff,#e8f0ff)}
+.ph-card em{display:block;font-style:normal;color:#2563eb;font-size:.78rem}
+.ph-pay{margin:8px 12px;border-radius:12px;background:#10b981;color:#fff;font-weight:800;font-size:.7rem;text-align:center;padding:11px}
+.float{position:absolute;display:flex;align-items:center;gap:10px;background:#fff;color:var(--text);border-radius:16px;padding:12px 16px;box-shadow:0 24px 50px -14px rgba(0,0,0,.55);font-size:.78rem;font-weight:700;animation:float 5s ease-in-out infinite}
+.float .dot{width:34px;height:34px;border-radius:11px;display:grid;place-items:center;color:#fff}
+.float small{display:block;color:var(--muted);font-weight:600;font-size:.68rem}
+.f1{right:-6px;bottom:90px;animation-delay:-1s}.f1 .dot{background:var(--green)}
+.f2{left:-14px;top:58px;animation-delay:-2.5s}.f2 .dot{background:var(--pink)}
+.f3{right:6px;top:-18px;animation-delay:-3.5s}.f3 .dot{background:var(--purple)}
+@keyframes float{50%{transform:translateY(-12px)}}
+@media(max-width:980px){.hero-grid{grid-template-columns:1fr}.stage{height:520px;max-width:560px;margin:10px auto 0}.hero{padding-top:128px}}
+@media(max-width:560px){.browser{display:none}.phone{left:50%;transform:translateX(-50%) rotate(-3deg)!important}.f2{left:2%}.f1{right:0}.stage{height:500px}}
+
+/* ---------- strips ---------- */
+.trust{background:#fff;border-bottom:1px solid var(--line)}
+.trust-in{display:flex;flex-wrap:wrap;gap:14px 38px;justify-content:center;padding:26px 0;color:var(--muted);font-weight:700;font-size:.92rem}
+.trust-in span{display:flex;align-items:center;gap:9px}
+.trust-in .icon{width:20px;height:20px;color:var(--purple)}
+
+section{padding:104px 0;position:relative}
+.eyebrow{display:inline-block;font-weight:800;font-size:.8rem;letter-spacing:.14em;text-transform:uppercase;background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent;margin-bottom:14px}
+h2{font-size:clamp(2rem,4vw,3.2rem);line-height:1.1;letter-spacing:-.03em;font-weight:800;margin-bottom:18px;text-wrap:balance}
+.sub{font-size:1.15rem;color:var(--muted);max-width:40em}
+.center{text-align:center}.center .sub{margin-inline:auto}
+.head{margin-bottom:56px}
+
+/* stats */
+.stats{background:var(--ink);color:#fff;padding:70px 0}
+.stat-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:28px}
+.stat b{display:block;font-size:clamp(2.4rem,5vw,3.7rem);font-weight:800;letter-spacing:-.03em;background:linear-gradient(100deg,var(--t1),var(--t2),var(--t3));-webkit-background-clip:text;background-clip:text;color:transparent;line-height:1}
+.stat span{display:block;margin-top:10px;color:rgba(255,255,255,.72);font-weight:600}
+@media(max-width:760px){.stat-grid{grid-template-columns:repeat(2,1fr)}}
+
+/* categories */
+.cat-wall{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:14px}
+.cat{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:20px 18px;display:flex;gap:14px;align-items:center;transition:transform .25s,box-shadow .25s,border-color .25s}
+.cat:hover{transform:translateY(-6px);box-shadow:var(--shadow);border-color:var(--edge)}
+.cat .e{font-size:1.9rem;width:52px;height:52px;border-radius:14px;display:grid;place-items:center;background:var(--grad-soft);flex:none}
+.cat b{display:block;font-size:.95rem;line-height:1.25}.cat small{color:var(--muted);font-weight:600;font-size:.74rem}
+
+/* feature cards */
+.cards{display:grid;grid-template-columns:repeat(3,1fr);gap:22px}
+@media(max-width:980px){.cards{grid-template-columns:repeat(2,1fr)}}@media(max-width:620px){.cards{grid-template-columns:1fr}}
+.fcard{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:30px 28px;transition:transform .3s,box-shadow .3s,border-color .3s;position:relative;overflow:hidden}
+.fcard::after{content:"";position:absolute;inset:auto -40px -60px auto;width:140px;height:140px;border-radius:50%;background:var(--grad-soft);transition:transform .4s}
+.fcard:hover{transform:translateY(-8px);box-shadow:var(--shadow);border-color:var(--edge)}
+.fcard:hover::after{transform:scale(1.8)}
+.ico{width:54px;height:54px;border-radius:16px;display:grid;place-items:center;color:#fff;margin-bottom:20px;position:relative;z-index:1;box-shadow:0 12px 24px -10px rgb(var(--purple-rgb) / .6)}
+.i1{background:linear-gradient(135deg,var(--pink),var(--purple))}.i2{background:linear-gradient(135deg,var(--purple),var(--blue))}.i3{background:linear-gradient(135deg,var(--blue),var(--pink))}.i4{background:linear-gradient(135deg,#10b981,#34d399)}.i5{background:linear-gradient(135deg,#f59e0b,#ffc233)}.i6{background:linear-gradient(135deg,var(--pink),var(--blue))}
+.fcard h3{font-size:1.2rem;margin-bottom:8px;position:relative;z-index:1}.fcard p{color:var(--muted);position:relative;z-index:1}
+
+/* playground */
+.play{background:linear-gradient(180deg,#fff 0%,var(--tint) 100%)}
+.play-grid{display:grid;grid-template-columns:1fr 360px;gap:60px;align-items:center}
+@media(max-width:940px){.play-grid{grid-template-columns:1fr}}
+.panel{background:#fff;border:1px solid var(--line);border-radius:26px;padding:28px;box-shadow:var(--shadow)}
+.plan-tabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:20px}
+.plan-tabs button{padding:10px 18px;border-radius:12px;border:1.5px solid var(--line);font-weight:700;font-size:.92rem;transition:all .2s;background:#fff}
+.plan-tabs button[aria-pressed="true"]{background:var(--ink);color:#fff;border-color:var(--ink)}
+.switches{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+@media(max-width:560px){.switches{grid-template-columns:1fr}}
+.sw{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 14px;border:1px solid var(--line);border-radius:14px;cursor:pointer;font-weight:600;font-size:.9rem;transition:background .2s,border-color .2s;user-select:none}
+.sw:hover{background:#faf8ff;border-color:var(--edge)}
+.sw input{position:absolute;opacity:0}
+.sw .tg{width:44px;height:25px;border-radius:99px;background:#d7d4e6;position:relative;transition:background .25s;flex:none}
+.sw .tg::after{content:"";position:absolute;top:3px;left:3px;width:19px;height:19px;border-radius:50%;background:#fff;box-shadow:0 2px 5px rgba(0,0,0,.25);transition:transform .25s}
+.sw input:checked + .tg{background:var(--green)}
+.sw input:checked + .tg::after{transform:translateX(19px)}
+.sw input:focus-visible + .tg{outline:3px solid var(--edge);outline-offset:2px}
+.hint{margin-top:16px;color:var(--muted);font-size:.9rem}
+
+/* the live mini storefront */
+.device{width:330px;max-width:100%;margin-inline:auto;border-radius:38px;background:#0e0e24;padding:11px;box-shadow:0 40px 80px -24px rgba(36,20,90,.7),inset 0 0 0 2px #2c2c55}
+.screen{background:#fff;border-radius:29px;overflow:hidden;height:620px;overflow-y:auto;scrollbar-width:none;position:relative}
+.screen::-webkit-scrollbar{display:none}
+.m-head{position:sticky;top:0;z-index:2;background:linear-gradient(120deg,var(--pink),var(--purple));color:#fff;padding:30px 16px 14px;display:flex;align-items:center;justify-content:space-between;transition:background .4s}
+.m-head b{font-size:1.05rem;letter-spacing:-.2px}
+.m-head .ic{display:flex;gap:12px;align-items:center}
+.m-head .icon{width:20px;height:20px}
+.m-search{margin:12px 14px 4px;background:#f3f1fb;border-radius:12px;padding:10px 14px;color:#8a88a6;font-size:.74rem;font-weight:600}
+.m-chips{display:flex;gap:7px;padding:8px 14px;overflow:hidden}
+.m-chips span{font-size:.64rem;font-weight:800;padding:6px 11px;border-radius:99px;background:#f3f1fb;color:#4a4a6a;white-space:nowrap}
+.m-chips span:first-child{background:var(--ink);color:#fff}
+.m-prod{margin:8px 14px;border:1px solid #eeeaf9;border-radius:18px;overflow:hidden;background:#fff}
+.m-img{height:132px;display:grid;place-items:center;font-size:3.2rem;position:relative}
+.m-img.a{background:linear-gradient(135deg,#ffd1dc,#ffeaf0)}.m-img.b{background:linear-gradient(135deg,#cfe0ff,#e8f0ff)}
+.m-heart{position:absolute;top:10px;right:10px;width:30px;height:30px;border-radius:50%;background:#fff;display:grid;place-items:center;box-shadow:0 4px 10px rgba(0,0,0,.15);color:var(--pink)}
+.m-heart .icon{width:16px;height:16px}
+.m-oos{position:absolute;left:10px;top:10px;background:var(--ink);color:#fff;font-size:.6rem;font-weight:800;padding:3px 9px;border-radius:7px}
+.m-body{padding:11px 13px 13px}
+.m-body h5{font-size:.82rem}
+.m-price{font-weight:800;font-size:.9rem}.m-price s{color:#9a98b3;font-weight:600;font-size:.72rem;margin-left:5px}.m-price em{color:#e8590c;font-style:normal;font-size:.7rem;margin-left:5px}
+.m-stars{color:#ffb400;font-size:.72rem;font-weight:700;margin:3px 0}
+.m-stars span{color:#6b6b85;margin-left:4px}
+.m-notify{margin-top:8px;border-radius:10px;background:#fff8e6;border:1px dashed var(--yellow);padding:7px 10px;font-size:.66rem;font-weight:700;display:flex;gap:7px;align-items:center}
+.m-share{display:flex;gap:6px;margin-top:9px;align-items:center;font-size:.62rem;font-weight:700;color:#6b6b85}
+.m-share i{width:22px;height:22px;border-radius:50%;display:grid;place-items:center;color:#fff;font-size:.55rem;font-style:normal;font-weight:800}
+.m-guest{margin:6px 14px;padding:9px 12px;border-radius:12px;background:#eef6ff;color:#1d4ed8;font-size:.68rem;font-weight:700}
+.m-guest.signin{background:#fff1f2;color:#be123c}
+.m-co{margin:10px 14px 18px;border-radius:18px;background:#faf9ff;border:1px solid #eeeaf9;padding:13px}
+.m-co h6{font-size:.74rem;margin-bottom:8px;letter-spacing:.02em}
+.m-addr{display:flex;gap:9px;align-items:flex-start;font-size:.66rem;font-weight:600;padding:9px 10px;border-radius:11px;background:#fff;border:2px solid var(--pink);margin-bottom:6px;transition:border-color .4s}
+.m-addr b{display:block;font-size:.72rem}
+.m-add{font-size:.66rem;font-weight:800;color:var(--purple);margin:2px 0 8px;display:block}
+.m-coupon{display:flex;gap:6px;margin:8px 0}
+.m-coupon span{flex:1;border:1.5px dashed var(--pink);border-radius:9px;padding:7px 9px;font-size:.66rem;font-weight:800;letter-spacing:.06em;color:var(--pink);background:#fff8fb}
+.m-coupon i{font-style:normal;background:var(--ink);color:#fff;border-radius:9px;padding:7px 11px;font-size:.66rem;font-weight:800}
+.m-pay{display:flex;flex-direction:column;gap:6px;margin:8px 0}
+.m-pay div{display:flex;gap:9px;align-items:center;padding:9px 10px;border-radius:11px;border:1.5px solid var(--line);background:#fff;font-size:.68rem;font-weight:700}
+.m-pay div.on{border-color:var(--pink);background:#fff5f8}
+.m-pay small{display:block;font-weight:600;color:#6b6b85;font-size:.6rem}
+.m-cta{display:block;text-align:center;background:linear-gradient(120deg,var(--pink),var(--purple));color:#fff;font-weight:800;font-size:.76rem;border-radius:12px;padding:12px;margin-top:8px;transition:background .4s}
+.m-cta.off{background:#c8c5d8}
+.feat-hide{display:none!important}
+.theme-row{display:flex;gap:8px;align-items:center;margin-top:20px;flex-wrap:wrap;font-weight:700;font-size:.88rem}
+.theme-row button{width:30px;height:30px;border-radius:50%;border:3px solid #fff;box-shadow:0 0 0 1.5px var(--line);transition:transform .2s}
+.theme-row button:hover{transform:scale(1.15)}
+
+/* admin */
+.admin{background:var(--ink);color:#fff;overflow:hidden}
+.admin::before{content:"";position:absolute;width:700px;height:700px;border-radius:50%;background:var(--glow);filter:blur(120px);opacity:.35;right:-250px;top:-150px}
+.admin .sub{color:rgba(255,255,255,.7)}
+.admin-grid{display:grid;grid-template-columns:1fr 1.05fr;gap:60px;align-items:center;position:relative}
+@media(max-width:980px){.admin-grid{grid-template-columns:1fr}}
+.ticks{list-style:none;display:grid;gap:16px;margin-top:30px}
+.ticks li{display:flex;gap:14px;align-items:flex-start}
+.ticks .ck{flex:none;width:28px;height:28px;border-radius:9px;background:rgba(16,185,129,.18);color:#34d399;display:grid;place-items:center;margin-top:2px}
+.ticks .ck .icon{width:16px;height:16px;stroke-width:3}
+.ticks b{display:block;font-size:1.04rem}.ticks span{color:rgba(255,255,255,.66);font-size:.95rem}
+.dash{background:#fff;color:var(--text);border-radius:24px;box-shadow:0 50px 90px -30px rgba(0,0,0,.8);padding:22px;transform:perspective(1400px) rotateY(-7deg);transition:transform .5s}
+.dash:hover{transform:perspective(1400px) rotateY(0)}
+.d-top{display:flex;gap:8px;margin-bottom:16px;font-size:.7rem;font-weight:700;flex-wrap:wrap}
+.d-top span{padding:6px 12px;border-radius:9px;background:#f3f1fb;color:#4a4a6a}.d-top span:first-child{background:var(--grad);color:#fff}
+.d-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:14px}
+.d-stat{border-radius:14px;padding:13px;color:#fff}
+.d-stat small{display:block;font-size:.64rem;opacity:.9;font-weight:600}.d-stat b{font-size:1.15rem}
+.ds1{background:linear-gradient(135deg,var(--pink),var(--purple))}.ds2{background:linear-gradient(135deg,var(--purple),var(--blue))}.ds3{background:linear-gradient(135deg,var(--blue),var(--pink))}
+.d-chart{display:flex;align-items:flex-end;gap:9px;height:120px;padding:12px;background:#faf9ff;border-radius:14px;margin-bottom:14px}
+.d-chart i{flex:1;border-radius:7px 7px 0 0;background:var(--grad);transform-origin:bottom;animation:grow 1.2s cubic-bezier(.2,.8,.2,1) both}
+@keyframes grow{from{transform:scaleY(0)}}
+.d-row{display:flex;justify-content:space-between;align-items:center;padding:10px 12px;border-radius:12px;background:#faf9ff;margin-bottom:7px;font-size:.72rem;font-weight:700}
+.d-row small{color:var(--muted);font-weight:600;display:block}
+.tag{padding:4px 10px;border-radius:99px;font-size:.62rem;font-weight:800}
+.tg-g{background:#d1fae5;color:#047857}.tg-o{background:#ffedd5;color:#c2410c}.tg-b{background:#dbeafe;color:#1d4ed8}
+
+/* platform owner */
+.own-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:20px;counter-reset:s}
+@media(max-width:980px){.own-grid{grid-template-columns:repeat(2,1fr)}}@media(max-width:560px){.own-grid{grid-template-columns:1fr}}
+.step{background:#fff;border:1px solid var(--line);border-radius:var(--radius);padding:30px 26px;position:relative;counter-increment:s}
+.step::before{content:counter(s);position:absolute;top:-18px;left:24px;width:40px;height:40px;border-radius:13px;background:var(--grad);color:#fff;font-weight:800;display:grid;place-items:center;box-shadow:0 10px 22px -8px rgb(var(--pink-rgb) / .7)}
+.step h3{margin:10px 0 8px;font-size:1.12rem}.step p{color:var(--muted);font-size:.96rem}
+.tenant-box{margin-top:60px;display:grid;grid-template-columns:1fr 1fr;gap:26px}
+@media(max-width:860px){.tenant-box{grid-template-columns:1fr}}
+.tb{background:linear-gradient(160deg,#fff,var(--tint-2));border:1px solid var(--line);border-radius:var(--radius);padding:30px}
+.tb h3{font-size:1.3rem;margin-bottom:6px}.tb p{color:var(--muted);margin-bottom:16px}
+.shops{display:grid;gap:10px}
+.shop{display:flex;align-items:center;gap:14px;background:#fff;border:1px solid var(--line);border-radius:14px;padding:12px 14px}
+.shop .lg{width:40px;height:40px;border-radius:12px;display:grid;place-items:center;color:#fff;font-weight:800;flex:none}
+.shop b{display:block;font-size:.92rem}.shop small{color:var(--muted);font-weight:600;font-size:.74rem}.shop .tag{margin-left:auto}
+.checks{list-style:none;display:grid;gap:10px}
+.checks li{display:flex;gap:10px;align-items:flex-start;font-weight:600;font-size:.96rem}
+.checks .icon{width:20px;height:20px;color:var(--green);stroke-width:3;margin-top:3px;flex:none}
+
+/* plans */
+.plans-sec{background:linear-gradient(180deg,var(--tint) 0%,#fbfaff 100%)}
+.plans{display:grid;grid-template-columns:repeat(3,1fr);gap:24px;align-items:stretch}
+@media(max-width:980px){.plans{grid-template-columns:1fr;max-width:520px;margin-inline:auto}}
+.plan{background:#fff;border:1.5px solid var(--line);border-radius:28px;padding:36px 32px;display:flex;flex-direction:column;position:relative;transition:transform .3s,box-shadow .3s}
+.plan:hover{transform:translateY(-8px);box-shadow:var(--shadow)}
+.plan.pop{background:var(--ink);color:#fff;border-color:transparent;transform:scale(1.04);box-shadow:0 40px 80px -30px rgb(var(--glow-rgb) / .7)}
+.plan.pop:hover{transform:scale(1.04) translateY(-8px)}
+@media(max-width:980px){.plan.pop{transform:none}.plan.pop:hover{transform:translateY(-8px)}}
+.ribbon{position:absolute;top:-15px;left:50%;transform:translateX(-50%);background:var(--grad);color:#fff;font-weight:800;font-size:.74rem;letter-spacing:.1em;padding:7px 18px;border-radius:99px;white-space:nowrap;box-shadow:0 10px 24px -8px rgb(var(--pink-rgb) / .8)}
+.plan h3{font-size:1.5rem}.plan .tagline{color:var(--muted);margin:6px 0 22px;min-height:3em}.plan.pop .tagline{color:rgba(255,255,255,.7)}
+.price{font-size:2.6rem;font-weight:800;letter-spacing:-.03em;line-height:1}
+.price small{font-size:.95rem;font-weight:600;color:var(--muted);letter-spacing:0}.plan.pop .price small{color:rgba(255,255,255,.65)}
+.price.q{font-size:1.7rem}
+.plan ul{list-style:none;margin:26px 0 30px;display:grid;gap:12px;flex:1}
+.plan li{display:flex;gap:11px;align-items:flex-start;font-weight:600;font-size:.96rem}
+.plan li .icon{width:20px;height:20px;color:var(--green);stroke-width:3;margin-top:3px;flex:none}
+.plan li.no{color:#a3a1bb;font-weight:500}.plan li.no .icon{color:#c9c6dd}
+.plan.pop li.no{color:rgba(255,255,255,.4)}.plan.pop li.no .icon{color:rgba(255,255,255,.3)}
+.plan .btn{width:100%}
+.matrix-wrap{margin-top:70px;background:#fff;border:1px solid var(--line);border-radius:var(--radius);overflow:hidden;box-shadow:0 20px 50px -30px rgba(36,20,90,.4)}
+table{width:100%;border-collapse:collapse;font-size:.95rem}
+th,td{padding:15px 20px;text-align:center;border-bottom:1px solid var(--line)}
+th:first-child,td:first-child{text-align:left;font-weight:700}
+thead th{background:#faf9ff;font-size:.9rem;position:sticky;top:0}
+tbody tr:hover{background:#fcfbff}
+tbody tr.grp td{background:var(--tint-2);font-weight:800;font-size:.76rem;letter-spacing:.12em;text-transform:uppercase;color:var(--purple)}
+td .y{color:var(--green)}td .n{color:#cfcce0}
+td .icon{width:22px;height:22px;display:inline-block;stroke-width:3}
+.tbl-scroll{overflow-x:auto}
+.note{text-align:center;color:var(--muted);margin-top:22px;font-weight:600}
+
+/* trust */
+.sec-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:20px}
+@media(max-width:980px){.sec-grid{grid-template-columns:repeat(2,1fr)}}@media(max-width:560px){.sec-grid{grid-template-columns:1fr}}
+.sec{padding:26px;border-radius:20px;background:#fff;border:1px solid var(--line)}
+.sec .icon{width:30px;height:30px;color:var(--purple);margin-bottom:14px}
+.sec h3{font-size:1.05rem;margin-bottom:6px}.sec p{color:var(--muted);font-size:.93rem}
+
+/* faq */
+.faq{max-width:820px;margin-inline:auto;display:grid;gap:12px}
+details{background:#fff;border:1px solid var(--line);border-radius:18px;padding:4px 24px;transition:border-color .2s,box-shadow .2s}
+details[open]{border-color:var(--edge);box-shadow:0 14px 34px -22px rgb(var(--purple-rgb) / .6)}
+summary{list-style:none;cursor:pointer;display:flex;justify-content:space-between;align-items:center;gap:16px;padding:20px 0;font-weight:700;font-size:1.04rem}
+summary::-webkit-details-marker{display:none}
+summary::after{content:"+";font-size:1.7rem;color:var(--purple);transition:transform .25s;flex:none;line-height:1}
+details[open] summary::after{transform:rotate(45deg)}
+details p{padding:0 0 22px;color:var(--muted)}
+
+/* final cta */
+.final{background:var(--ink);color:#fff;text-align:center;overflow:hidden;isolation:isolate;padding:120px 0}
+.final::before,.final::after{content:"";position:absolute;border-radius:50%;filter:blur(100px);z-index:-1}
+.final::before{width:560px;height:560px;background:var(--pink);left:-160px;bottom:-240px;opacity:.5}
+.final::after{width:620px;height:620px;background:var(--glow);right:-180px;top:-240px;opacity:.55}
+.final h2{font-size:clamp(2.2rem,5vw,3.8rem)}
+.final .sub{color:rgba(255,255,255,.74);margin-inline:auto}
+.final .cta-row{justify-content:center}
+.small-print{color:rgba(255,255,255,.55);font-size:.88rem;margin-top:8px}
+/* ---- contact section ---- */
+.btn-wa{background:var(--whatsapp);color:#fff;box-shadow:0 12px 28px -10px rgba(37,211,102,.7)}.btn-wa:hover{transform:translateY(-3px)}
+.btn-sm{padding:9px 14px;font-size:.84rem;border-radius:11px}
+.final{padding-bottom:160px}
+.cbody{margin-top:-90px;position:relative;z-index:2;padding:0 0 100px}
+.cgrid{display:grid;grid-template-columns:.95fr 1.05fr;gap:28px;align-items:start}
+@media(max-width:940px){.cgrid{grid-template-columns:1fr}}
+.ccard{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);padding:34px;color:var(--text)}
+@media(max-width:560px){.ccard{padding:24px 20px}}
+.ceo{display:flex;align-items:center;gap:18px;margin-bottom:22px}
+.ccard .av{width:78px;height:78px;border-radius:50%;background:var(--grad);display:grid;place-items:center;color:#fff;font-weight:800;font-size:1.6rem;flex:none;box-shadow:0 14px 30px -10px rgb(var(--pink-rgb) / .7),0 0 0 5px #fff,0 0 0 6px var(--line)}
+.ceo h3{font-size:1.6rem;letter-spacing:-.02em;line-height:1.15}
+.role{display:inline-block;margin-top:6px;padding:4px 12px;border-radius:99px;font-size:.78rem;font-weight:800;letter-spacing:.06em;background:var(--grad-soft);color:var(--purple)}
+.intro{color:var(--muted);margin-bottom:22px}
+.ways{display:grid;gap:12px}
+.way{display:flex;align-items:center;gap:14px;padding:14px 16px;border:1.5px solid var(--line);border-radius:18px;background:#fff;transition:border-color .2s,transform .2s,box-shadow .2s}
+.way:hover{border-color:var(--edge);transform:translateY(-3px);box-shadow:0 16px 34px -22px rgb(var(--purple-rgb) / .6)}
+.way .ic{width:46px;height:46px;border-radius:14px;display:grid;place-items:center;color:#fff;flex:none}
+.way .ic.c1{background:linear-gradient(135deg,var(--pink),var(--purple))}.way .ic.c2{background:var(--whatsapp)}.way .ic.c3{background:linear-gradient(135deg,var(--purple),var(--blue))}
+.way .t{min-width:0;flex:1}.way small{display:block;color:var(--muted);font-weight:700;font-size:.74rem;letter-spacing:.06em;text-transform:uppercase}
+.way b{display:block;font-size:1.04rem;overflow-wrap:anywhere}
+.way .acts{display:flex;gap:8px;flex:none}
+@media(max-width:560px){.way{flex-wrap:wrap}.way .acts{width:100%}.way .acts .btn{flex:1}}
+.copy{width:38px;height:38px;border-radius:11px;border:1.5px solid var(--line);display:grid;place-items:center;color:var(--muted);transition:all .2s;background:#fff;flex:none}
+.copy:hover{border-color:var(--pink);color:var(--pink)}
+.save{margin-top:20px;display:flex;gap:12px;flex-wrap:wrap;align-items:center}.save small{color:var(--muted)}
+.ccard h3.ft{font-size:1.5rem;letter-spacing:-.02em;margin-bottom:4px}
+.csub{color:var(--muted);margin-bottom:22px}
+.cform{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.cform .f{display:flex;flex-direction:column;gap:7px}.cform .f.full{grid-column:1/-1}
+@media(max-width:560px){.cform{grid-template-columns:1fr}}
+.cform label{font-weight:700;font-size:.86rem}.cform label i{color:var(--pink);font-style:normal}
+.cform input,.cform select,.cform textarea{width:100%;padding:13px 14px;border:1.5px solid var(--line);border-radius:13px;background:#fff;outline:none;transition:border-color .2s,box-shadow .2s;font:inherit;font-size:1rem;color:var(--text)}
+.cform input:focus,.cform select:focus,.cform textarea:focus{border-color:var(--pink);box-shadow:0 0 0 4px rgb(var(--pink-rgb) / .13)}
+.cform .bad{border-color:#ef4444!important;box-shadow:0 0 0 4px rgba(239,68,68,.12)!important}
+.cform textarea{min-height:130px;resize:vertical}
+.cform .err{color:#dc2626;font-weight:600;font-size:.86rem}.cform .err:empty{display:none}
+.cform .send{grid-column:1/-1;display:flex;gap:12px;flex-wrap:wrap;margin-top:6px}.cform .send .btn{flex:1 1 200px}
+.fnote{grid-column:1/-1;font-size:.82rem;color:var(--muted)}
+.toast{position:fixed;left:50%;bottom:28px;transform:translate(-50%,30px);background:var(--ink);color:#fff;padding:13px 22px;border-radius:14px;font-weight:700;font-size:.92rem;box-shadow:0 20px 50px -14px rgba(0,0,0,.6);opacity:0;pointer-events:none;transition:opacity .25s,transform .25s;z-index:400;max-width:calc(100vw - 32px);text-align:center}
+.toast.show{opacity:1;transform:translate(-50%,0)}
+.ceo-line{display:inline-flex;align-items:center;gap:16px;margin:30px auto 6px;padding:14px 22px 14px 16px;border-radius:20px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.16);backdrop-filter:blur(10px);text-align:left}
+.ceo-line .av{width:52px;height:52px;border-radius:50%;background:var(--grad);display:grid;place-items:center;font-weight:800;font-size:1.05rem;flex:none;box-shadow:0 10px 24px -8px rgb(var(--pink-rgb) / .7)}
+.ceo-line b{display:block;font-size:1.05rem}.ceo-line small{display:block;color:rgba(255,255,255,.72);font-size:.88rem;line-height:1.5}
+.ceo-line a:hover{text-decoration:underline}
+footer{background:var(--ink-3);color:rgba(255,255,255,.6);padding:40px 0;font-size:.92rem}
+.foot{display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap;align-items:center}
+.foot a:hover{color:#fff}.foot nav{display:flex;gap:24px;flex-wrap:wrap}
+
+/* reveal */
+.rv{opacity:0;transform:translateY(34px);transition:opacity .8s cubic-bezier(.2,.7,.2,1),transform .8s cubic-bezier(.2,.7,.2,1)}
+.rv.in{opacity:1;transform:none}
+.rv.d1{transition-delay:.08s}.rv.d2{transition-delay:.16s}.rv.d3{transition-delay:.24s}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}.rv{opacity:1;transform:none}html{scroll-behavior:auto}}
+</style>
+</head>
+<body>
+
+<!-- icon sprite -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="i-bag" viewBox="0 0 24 24"><path d="M5 8h14l-1.2 11.2a2 2 0 0 1-2 1.8H8.2a2 2 0 0 1-2-1.8z"/><path d="M9 8V6.5a3 3 0 0 1 6 0V8"/></symbol>
+  <symbol id="i-phone" viewBox="0 0 24 24"><rect x="7" y="2.5" width="10" height="19" rx="2.5"/><path d="M11 18.5h2"/></symbol>
+  <symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="6.5"/><path d="m16 16 4.5 4.5"/></symbol>
+  <symbol id="i-card" viewBox="0 0 24 24"><rect x="2.5" y="5" width="19" height="14" rx="3"/><path d="M2.5 10h19M6.5 15h4"/></symbol>
+  <symbol id="i-heart" viewBox="0 0 24 24"><path d="M12 20s-7.5-4.6-7.5-10.2A4.3 4.3 0 0 1 12 7.4a4.3 4.3 0 0 1 7.5 2.4C19.5 15.4 12 20 12 20z"/></symbol>
+  <symbol id="i-star" viewBox="0 0 24 24"><path d="m12 3.5 2.6 5.4 5.9.8-4.3 4.1 1 5.9L12 16.9l-5.2 2.8 1-5.9L3.5 9.7l5.9-.8z"/></symbol>
+  <symbol id="i-bell" viewBox="0 0 24 24"><path d="M6 16.5V11a6 6 0 0 1 12 0v5.5l1.5 2h-15z"/><path d="M10 21h4"/></symbol>
+  <symbol id="i-share" viewBox="0 0 24 24"><circle cx="6" cy="12" r="2.6"/><circle cx="17.5" cy="6" r="2.6"/><circle cx="17.5" cy="18" r="2.6"/><path d="m8.3 10.7 7-3.4M8.3 13.3l7 3.4"/></symbol>
+  <symbol id="i-tag" viewBox="0 0 24 24"><path d="M3.5 12.2V4.5h7.7l9 9a1.8 1.8 0 0 1 0 2.5l-5.2 5.2a1.8 1.8 0 0 1-2.5 0z"/><circle cx="8" cy="9" r="1.2"/></symbol>
+  <symbol id="i-pin" viewBox="0 0 24 24"><path d="M12 21s-6.5-5.7-6.5-11a6.5 6.5 0 0 1 13 0c0 5.3-6.5 11-6.5 11z"/><circle cx="12" cy="10" r="2.4"/></symbol>
+  <symbol id="i-layers" viewBox="0 0 24 24"><path d="m12 3 9 5-9 5-9-5z"/><path d="m3 13 9 5 9-5"/></symbol>
+  <symbol id="i-globe" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c3 3 3 15 0 18M12 3c-3 3-3 15 0 18"/></symbol>
+  <symbol id="i-chart" viewBox="0 0 24 24"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></symbol>
+  <symbol id="i-lock" viewBox="0 0 24 24"><rect x="4.5" y="10.5" width="15" height="10" rx="2.5"/><path d="M8 10.5V8a4 4 0 0 1 8 0v2.5"/></symbol>
+  <symbol id="i-shield" viewBox="0 0 24 24"><path d="M12 3 4.5 6v5.5c0 4.5 3 8 7.5 9.5 4.5-1.5 7.5-5 7.5-9.5V6z"/><path d="m9 12 2.2 2.2L15.5 10"/></symbol>
+  <symbol id="i-zap" viewBox="0 0 24 24"><path d="M13 2.5 4.5 13.5H11L10 21.5l8.5-11H12z"/></symbol>
+  <symbol id="i-box" viewBox="0 0 24 24"><path d="m12 3 8.5 4.5v9L12 21l-8.5-4.5v-9z"/><path d="m3.5 7.5 8.5 4.5 8.5-4.5M12 12v9"/></symbol>
+  <symbol id="i-palette" viewBox="0 0 24 24"><path d="M12 3a9 9 0 1 0 0 18c1.4 0 2-1 1.6-2-.5-1.2.2-2.5 1.6-2.5H17a4 4 0 0 0 4-4A9 9 0 0 0 12 3z"/><circle cx="7.5" cy="11" r="1.1"/><circle cx="10" cy="7.2" r="1.1"/><circle cx="15" cy="7.2" r="1.1"/></symbol>
+  <symbol id="i-users" viewBox="0 0 24 24"><circle cx="9" cy="8.5" r="3.2"/><path d="M3 19.5c.6-3.3 3-5 6-5s5.4 1.7 6 5"/><circle cx="17.5" cy="9.5" r="2.5"/><path d="M17 14.6c2.4.2 3.9 1.7 4.5 4.4"/></symbol>
+  <symbol id="i-refund" viewBox="0 0 24 24"><path d="M4 12a8 8 0 1 0 2.5-5.8L4 8.5"/><path d="M4 4v4.5h4.5"/><path d="M12 8v4l2.5 1.5"/></symbol>
+  <symbol id="i-check" viewBox="0 0 24 24"><path d="m5 12.5 4.5 4.5L19 7.5"/></symbol>
+  <symbol id="i-x" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></symbol>
+  <symbol id="i-mail" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="3"/><path d="m4 7.5 8 6 8-6"/></symbol>
+  <symbol id="i-call" viewBox="0 0 24 24"><path d="M5 4.5h3.2l1.6 4-2 1.4a11 11 0 0 0 5.3 5.3l1.4-2 4 1.6V18a2 2 0 0 1-2.2 2A15.5 15.5 0 0 1 3 6.7 2 2 0 0 1 5 4.5z"/></symbol>
+  <symbol id="i-chat" viewBox="0 0 24 24"><path d="M4 5.5h16a1.5 1.5 0 0 1 1.5 1.5v9a1.5 1.5 0 0 1-1.5 1.5H10l-4.5 3.5V17.5H4A1.5 1.5 0 0 1 2.5 16V7A1.5 1.5 0 0 1 4 5.5z"/><path d="M7 10h10M7 13.5h6"/></symbol>
+  <symbol id="i-copy" viewBox="0 0 24 24"><rect x="8.5" y="8.5" width="11" height="11" rx="2.5"/><path d="M15.5 8.5V6.5a2 2 0 0 0-2-2h-7a2 2 0 0 0-2 2v7a2 2 0 0 0 2 2h2"/></symbol>
+  <symbol id="i-user" viewBox="0 0 24 24"><circle cx="12" cy="8" r="3.8"/><path d="M4.5 20c.8-4 3.7-6 7.5-6s6.7 2 7.5 6"/></symbol>
+  <symbol id="i-send" viewBox="0 0 24 24"><path d="m21 3-9.5 18-2.3-7.7L1.5 11z"/><path d="m9.2 13.3 11.8-10"/></symbol>
+  <symbol id="i-server" viewBox="0 0 24 24"><rect x="3.5" y="4" width="17" height="6.5" rx="2"/><rect x="3.5" y="13.5" width="17" height="6.5" rx="2"/><path d="M7.5 7.2h.01M7.5 16.8h.01"/></symbol>
+</svg>
+
+<!-- ============ NAV ============ -->
+<header class="nav" id="nav">
+  <div class="wrap nav-in">
+    <a class="brand" href="#top" aria-label="Home"><span class="mark"><svg><use href="#i-bag"/></svg></span><span data-brand>StyleKart</span></a>
+    <nav class="links" aria-label="Main">
+      <a href="#features">Features</a><a href="#playground">Live demo</a><a href="#admin">Admin</a><a href="#platform">Platform</a><a href="#plans">Plans</a><a href="#faq">FAQ</a><a href="#contact">Contact</a>
+    </nav>
+    <a class="btn btn-primary" href="#contact">Book a free demo</a>
+  </div>
+</header>
+
+<main id="top">
+<!-- ============ HERO ============ -->
+<section class="hero" style="padding-bottom:120px">
+  <div class="grid-bg"></div>
+  <div class="wrap hero-grid">
+    <div>
+      <span class="pill rv"><b>NEW</b> Multi-shop platform &bull; UPI &amp; cards built in</span>
+      <h1 class="rv d1">Your shop. Your brand.<br><span class="grad-text">Live in days,<br>not months.</span></h1>
+      <p class="lead rv d2">A complete, mobile-first online store with payments, a powerful admin panel and your own logo, colours and domain. Selling fashion, gadgets, groceries or gifts &mdash; launch a store customers love and get paid straight to your own account.</p>
+      <div class="cta-row rv d3">
+        <a class="btn btn-primary btn-lg" href="#contact">Book a free demo <svg class="icon"><use href="#i-zap"/></svg></a>
+        <a class="btn btn-ghost btn-lg" href="#playground">Try the live switches</a>
+      </div>
+      <div class="pay-row rv d3">Customers pay with <span class="chip">UPI</span><span class="chip">Cards</span><span class="chip">Net banking</span><span class="chip">Wallets</span><span class="chip">Cash on delivery</span></div>
+    </div>
+
+    <div class="stage rv d2" aria-hidden="true">
+      <div class="browser">
+        <div class="bar"><i></i><i></i><i></i><span>fashionhub.in</span></div>
+        <div class="shop-hero"><small>WELCOME TO FASHIONHUB</small><h4>Wear the trend,<br>own the moment.</h4><span class="mini-btn">Shop now</span></div>
+        <div class="shop-cats"><span>👗 Fashion</span><span>👟 Footwear</span><span>💍 Jewellery</span><span>🎁 Gifts</span></div>
+        <div class="shop-prods">
+          <div class="sp"><div class="ph a">👗</div><div class="t">Floral Midi Dress<b>₹1,599</b></div></div>
+          <div class="sp"><div class="ph b">👟</div><div class="t">Classic Sneakers<b>₹2,199</b></div></div>
+          <div class="sp"><div class="ph c">🕶️</div><div class="t">Aviator Shades<b>₹899</b></div></div>
+        </div>
+      </div>
+      <div class="phone">
+        <div class="scr"><div class="notch"></div>
+          <div class="ph-head">TechMart<small>Gadgets for everyone</small></div>
+          <div class="ph-card"><div class="im">🎧</div><div>Wireless Earbuds Pro<em>₹1,999 <s style="color:#9a98b3;font-weight:600">₹4,999</s></em></div></div>
+          <div class="ph-card"><div class="im">⌚</div><div>Fitness Smart Watch<em>₹2,999 <s style="color:#9a98b3;font-weight:600">₹6,999</s></em></div></div>
+          <div class="ph-card"><div class="im">📱</div><div>Smartphone X5 5G<em>₹15,999</em></div></div>
+          <div class="ph-pay">Pay ₹1,999 with UPI</div>
+        </div>
+      </div>
+      <div class="float f1"><span class="dot"><svg class="icon"><use href="#i-check"/></svg></span><div>Payment received<small>₹2,598 &bull; UPI</small></div></div>
+      <div class="float f2"><span class="dot"><svg class="icon"><use href="#i-bag"/></svg></span><div>New order #FA2610<small>Just now</small></div></div>
+      <div class="float f3"><span class="dot"><svg class="icon"><use href="#i-bell"/></svg></span><div>Back in stock!<small>12 shoppers notified</small></div></div>
+    </div>
+  </div>
+</section>
+
+<div class="trust"><div class="wrap trust-in">
+  <span><svg class="icon"><use href="#i-phone"/></svg>Mobile-first</span>
+  <span><svg class="icon"><use href="#i-shield"/></svg>Secure Razorpay payments</span>
+  <span><svg class="icon"><use href="#i-globe"/></svg>Your own domain</span>
+  <span><svg class="icon"><use href="#i-palette"/></svg>Your logo, your colours</span>
+  <span><svg class="icon"><use href="#i-server"/></svg>Docker-ready deployment</span>
+</div></div>
+
+<!-- ============ STATS ============ -->
+<section class="stats"><div class="wrap stat-grid">
+  <div class="stat rv"><b data-count="15" data-suffix="">0</b><span>ready-made category families</span></div>
+  <div class="stat rv d1"><b data-count="70" data-suffix="+">0</b><span>sub-categories out of the box</span></div>
+  <div class="stat rv d2"><b data-count="9" data-suffix="">0</b><span>features you can switch on or off per shop</span></div>
+  <div class="stat rv d3"><b data-count="1" data-suffix=" panel">0</b><span>to run every shop, from one control room</span></div>
+</div></section>
+
+<!-- ============ CATEGORIES ============ -->
+<section id="categories">
+  <div class="wrap">
+    <div class="head center"><span class="eyebrow rv">Every kind of business</span><h2 class="rv d1">From fashion to groceries &mdash;<br>one platform fits all.</h2><p class="sub rv d2">A Flipkart-and-Amazon-style category catalogue is ready from day one. Each category already knows what shoppers choose (Size, Storage, Pack size&hellip;) and which details to show (Warranty, Author, Shelf life&hellip;).</p></div>
+    <div class="cat-wall" id="catWall"></div>
+  </div>
+</section>
+
+<!-- ============ STOREFRONT FEATURES ============ -->
+<section id="features" style="background:#fff">
+  <div class="wrap">
+    <div class="head center"><span class="eyebrow rv">The storefront</span><h2 class="rv d1">A shopping experience<br>your customers will actually enjoy.</h2><p class="sub rv d2">Fast, beautiful on every phone, and designed around how people in India really shop and pay.</p></div>
+    <div class="cards">
+      <article class="fcard rv"><div class="ico i1"><svg class="icon"><use href="#i-phone"/></svg></div><h3>Mobile-first, desktop-perfect</h3><p>Bottom navigation, slide-in filters and a sticky buy bar on phones &mdash; and a rich layout on larger screens. One storefront, every device.</p></article>
+      <article class="fcard rv d1"><div class="ico i2"><svg class="icon"><use href="#i-card"/></svg></div><h3>UPI, cards, wallets &amp; COD</h3><p>Google Pay, PhonePe, Paytm, cards, net banking and wallets via Razorpay &mdash; plus cash on delivery. Payments are verified securely on the server.</p></article>
+      <article class="fcard rv d2"><div class="ico i3"><svg class="icon"><use href="#i-search"/></svg></div><h3>Search that stays in your shop</h3><p>Instant search, category trees, price, brand and variant filters, and sorting. Customers only ever see what <em>your</em> shop sells.</p></article>
+      <article class="fcard rv"><div class="ico i4"><svg class="icon"><use href="#i-layers"/></svg></div><h3>Variants with real stock</h3><p>Sizes, storage options or pack sizes &mdash; each with its own stock count. Sold-out options are clearly marked so nobody is disappointed at checkout.</p></article>
+      <article class="fcard rv d1"><div class="ico i5"><svg class="icon"><use href="#i-bell"/></svg></div><h3>&ldquo;Notify me&rdquo; back-in-stock emails</h3><p>Turn missed sales into sales. Shoppers leave their email on a sold-out item and are told automatically the moment you restock.</p></article>
+      <article class="fcard rv d2"><div class="ico i6"><svg class="icon"><use href="#i-pin"/></svg></div><h3>Saved addresses, faster checkout</h3><p>Customers keep multiple addresses (home, work, other), pick one at checkout and pay in a few taps. Guests can fill the bag first and sign in later.</p></article>
+      <article class="fcard rv"><div class="ico i1"><svg class="icon"><use href="#i-tag"/></svg></div><h3>Coupons &amp; discounts</h3><p>Percentage or flat codes with minimum order, maximum discount, expiry and usage limits &mdash; plus one-click bulk discounts across a whole category.</p></article>
+      <article class="fcard rv d1"><div class="ico i2"><svg class="icon"><use href="#i-heart"/></svg></div><h3>Wishlist &amp; reviews</h3><p>Shoppers save favourites and rate products. Social proof builds trust and keeps people coming back.</p></article>
+      <article class="fcard rv d2"><div class="ico i3"><svg class="icon"><use href="#i-share"/></svg></div><h3>Share on WhatsApp &amp; social</h3><p>One tap to share a product on WhatsApp, Facebook, Instagram, X, Telegram or Pinterest &mdash; free word-of-mouth marketing.</p></article>
+    </div>
+  </div>
+</section>
+
+<!-- ============ INTERACTIVE PLAYGROUND ============ -->
+<section class="play" id="playground">
+  <div class="wrap play-grid">
+    <div>
+      <span class="eyebrow rv">See it for yourself</span>
+      <h2 class="rv d1">Every customer gets<br>exactly the features they need.</h2>
+      <p class="sub rv d2" style="margin-bottom:28px">Flip the switches &mdash; the phone updates instantly. That&rsquo;s exactly how you shape each shop from your control room.</p>
+      <div class="panel rv d2">
+        <div class="plan-tabs" role="group" aria-label="Plan presets">
+          <button data-plan="basic" aria-pressed="false">Basic</button>
+          <button data-plan="standard" aria-pressed="false">Standard</button>
+          <button data-plan="premium" aria-pressed="true">Premium</button>
+        </div>
+        <div class="switches" id="switches"></div>
+        <div class="theme-row">Demo shop colour: <button style="background:#ff3f6c" data-c="#ff3f6c,#7b2ff7" aria-label="Pink"></button><button style="background:#2563eb" data-c="#2563eb,#06b6d4" aria-label="Blue"></button><button style="background:#059669" data-c="#059669,#84cc16" aria-label="Green"></button><button style="background:#f59e0b" data-c="#f59e0b,#ef4444" aria-label="Amber"></button><button style="background:#111827" data-c="#111827,#6366f1" aria-label="Midnight"></button></div>
+        <p class="hint">Plans are just starting points. Mix and match features for every single customer.</p>
+      </div>
+    </div>
+
+    <div class="device rv d1" aria-label="Interactive storefront preview">
+      <div class="screen" id="screen">
+        <div class="m-head"><b data-shopname>Your Shop</b><span class="ic"><span data-feat="wishlist"><svg class="icon"><use href="#i-heart"/></svg></span><svg class="icon"><use href="#i-bag"/></svg></span></div>
+        <div class="m-search">Search your catalogue&hellip;</div>
+        <div class="m-chips"><span>All</span><span>👗 Fashion</span><span>📱 Electronics</span><span>🛒 Grocery</span></div>
+        <div class="m-guest signin feat-hide" data-nofeat="guest_cart">🔒 Sign in to add items to your bag</div>
+        <div class="m-guest" data-feat="guest_cart">🛍️ Browse and fill your bag &mdash; sign in only at checkout</div>
+
+        <div class="m-prod">
+          <div class="m-img a">👗<span class="m-heart" data-feat="wishlist"><svg class="icon"><use href="#i-heart"/></svg></span></div>
+          <div class="m-body"><h5>Floral Wrap Midi Dress</h5>
+            <div class="m-price">₹1,599<s>₹3,299</s><em>51% OFF</em></div>
+            <div class="m-stars" data-feat="reviews">★★★★☆ <span>4.6 &bull; 128 reviews</span></div>
+            <div class="m-share" data-feat="social_share">Share <i style="background:#25d366">WA</i><i style="background:#1877f2">f</i><i style="background:linear-gradient(45deg,#f09433,#bc1888)">IG</i><i style="background:#000">X</i></div>
+          </div>
+        </div>
+        <div class="m-prod">
+          <div class="m-img b">🎧<span class="m-oos">Sold out</span><span class="m-heart" data-feat="wishlist"><svg class="icon"><use href="#i-heart"/></svg></span></div>
+          <div class="m-body"><h5>Wireless Earbuds Pro</h5>
+            <div class="m-price">₹1,999<s>₹4,999</s><em>60% OFF</em></div>
+            <div class="m-stars" data-feat="reviews">★★★★★ <span>4.8 &bull; 342 reviews</span></div>
+            <div class="m-notify" data-feat="stock_alerts"><svg class="icon" style="width:15px;height:15px"><use href="#i-bell"/></svg>Notify me when it&rsquo;s back in stock</div>
+          </div>
+        </div>
+
+        <div class="m-co">
+          <h6>CHECKOUT</h6>
+          <div class="m-addr"><svg class="icon" style="width:16px;height:16px;flex:none;color:var(--pink)"><use href="#i-pin"/></svg><div><b>Home &bull; Priya S.</b>12 MG Road, Hyderabad 500001</div></div>
+          <span class="m-add" data-feat="multi_address">+ Deliver to a new address</span>
+          <div class="m-coupon" data-feat="coupons"><span>WELCOME100</span><i>Apply</i></div>
+          <div class="m-pay">
+            <div class="on" data-feat="online_payments"><svg class="icon" style="width:17px;height:17px;flex:none"><use href="#i-card"/></svg><span>Pay online<small>UPI, cards, net banking, wallets</small></span></div>
+            <div data-feat="cod"><svg class="icon" style="width:17px;height:17px;flex:none"><use href="#i-box"/></svg><span>Cash on delivery<small>Pay when it arrives</small></span></div>
+          </div>
+          <span class="m-cta" id="cta">Place order</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ ADMIN ============ -->
+<section class="admin" id="admin">
+  <div class="wrap admin-grid">
+    <div>
+      <span class="eyebrow rv">For shop owners</span>
+      <h2 class="rv d1">Run your whole business from one beautiful admin.</h2>
+      <p class="sub rv d2">No technical skills needed. Add products, watch sales and keep customers happy &mdash; from your phone or laptop.</p>
+      <ul class="ticks">
+        <li class="rv"><span class="ck"><svg class="icon"><use href="#i-check"/></svg></span><div><b>Live dashboard</b><span>Revenue, today&rsquo;s sales, orders to ship, a 7-day sales chart and low-stock alerts at a glance.</span></div></li>
+        <li class="rv d1"><span class="ck"><svg class="icon"><use href="#i-check"/></svg></span><div><b>Products in minutes</b><span>Upload photos, set stock per size or pack, price with a discount % and add category-specific details.</span></div></li>
+        <li class="rv d1"><span class="ck"><svg class="icon"><use href="#i-check"/></svg></span><div><b>Orders, payments &amp; refunds</b><span>Search and filter orders, update their status, see every payment, and refund an online payment with one click.</span></div></li>
+        <li class="rv d2"><span class="ck"><svg class="icon"><use href="#i-check"/></svg></span><div><b>Your brand, your way</b><span>Change your shop name, upload your logo, pick your colours and set delivery fees &mdash; the whole store updates instantly.</span></div></li>
+        <li class="rv d2"><span class="ck"><svg class="icon"><use href="#i-check"/></svg></span><div><b>Your Razorpay, your money</b><span>Connect your own Razorpay account. Customer payments go straight to your bank &mdash; never through us.</span></div></li>
+      </ul>
+    </div>
+    <div class="dash rv d2" aria-hidden="true">
+      <div class="d-top"><span>Dashboard</span><span>Products</span><span>Orders</span><span>Payments</span><span>Coupons</span><span>Settings &amp; brand</span></div>
+      <div class="d-stats"><div class="d-stat ds1"><small>Revenue</small><b>₹4,82,350</b></div><div class="d-stat ds2"><small>Today</small><b>₹18,940</b></div><div class="d-stat ds3"><small>To ship</small><b>23</b></div></div>
+      <div class="d-chart"><i style="height:38%"></i><i style="height:55%"></i><i style="height:44%"></i><i style="height:72%"></i><i style="height:61%"></i><i style="height:88%"></i><i style="height:100%"></i></div>
+      <div class="d-row"><div>#FA261004B2<small>Priya S. &bull; UPI</small></div><span class="tag tg-g">Paid</span></div>
+      <div class="d-row"><div>#FA261004A9<small>Rahul M. &bull; Cash on delivery</small></div><span class="tag tg-b">Shipped</span></div>
+      <div class="d-row"><div>Running Shoes Pro &bull; size 9<small>Only 2 left</small></div><span class="tag tg-o">Low stock</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ PLATFORM ============ -->
+<section id="platform">
+  <div class="wrap">
+    <div class="head center"><span class="eyebrow rv">For the platform owner</span><h2 class="rv d1">One control room.<br>Unlimited shops.</h2><p class="sub rv d2">Onboard a new business in minutes. You decide exactly what each customer gets &mdash; and change it any time.</p></div>
+    <div class="own-grid">
+      <div class="step rv"><h3>Create the shop</h3><p>Name it, give it a shop ID and (optionally) its own domain such as <b>shop.theirbrand.com</b>.</p></div>
+      <div class="step rv d1"><h3>Pick a plan &amp; features</h3><p>Start from Basic, Standard or Premium, then switch individual features on or off for this customer.</p></div>
+      <div class="step rv d2"><h3>Choose their categories</h3><p>Tick the category families they sell in. Their menu, search and product forms follow automatically.</p></div>
+      <div class="step rv d3"><h3>Hand over the keys</h3><p>Create their admin login, share the link &mdash; they upload their logo, add products and start selling.</p></div>
+    </div>
+    <div class="tenant-box">
+      <div class="tb rv">
+        <h3>See every shop at a glance</h3><p>Products, orders and status for each customer in one list.</p>
+        <div class="shops">
+          <div class="shop"><span class="lg" style="background:linear-gradient(135deg,#ff3f6c,#7b2ff7)">F</span><div><b>FashionHub</b><small>fashionhub.in &bull; Premium</small></div><span class="tag tg-g">Active</span></div>
+          <div class="shop"><span class="lg" style="background:linear-gradient(135deg,#2563eb,#06b6d4)">T</span><div><b>TechMart</b><small>techmart.example &bull; Standard</small></div><span class="tag tg-g">Active</span></div>
+          <div class="shop"><span class="lg" style="background:linear-gradient(135deg,#059669,#84cc16)">G</span><div><b>FreshBasket</b><small>fresh.example.com &bull; Basic</small></div><span class="tag tg-g">Active</span></div>
+          <div class="shop"><span class="lg" style="background:linear-gradient(135deg,#f59e0b,#ef4444)">H</span><div><b>HomeNest</b><small>homenest.example &bull; Custom</small></div><span class="tag tg-o">Suspended</span></div>
+        </div>
+      </div>
+      <div class="tb rv d1">
+        <h3>Built for safe, separate businesses</h3><p>Every shop is its own world.</p>
+        <ul class="checks">
+          <li><svg class="icon"><use href="#i-check"/></svg>Customers, orders, products and coupons are completely separate per shop</li>
+          <li><svg class="icon"><use href="#i-check"/></svg>The same email or mobile can sign up in different shops</li>
+          <li><svg class="icon"><use href="#i-check"/></svg>Each shop connects its own Razorpay account &mdash; secrets stored encrypted</li>
+          <li><svg class="icon"><use href="#i-check"/></svg>Switch features or categories any time &mdash; changes apply instantly</li>
+          <li><svg class="icon"><use href="#i-check"/></svg>Suspend a shop with one click; other shops are unaffected</li>
+          <li><svg class="icon"><use href="#i-check"/></svg>Add your own categories to the shared catalogue</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ PLANS ============ -->
+<section class="plans-sec" id="plans">
+  <div class="wrap">
+    <div class="head center"><span class="eyebrow rv">Plans</span><h2 class="rv d1">Simple plans that<br>grow with every customer.</h2><p class="sub rv d2">Every plan includes the full mobile storefront, the admin panel, your branding and your own payments. Premium unlocks the growth features.</p></div>
+    <div class="plans" id="plansGrid"></div>
+    <p class="note rv">Need something different? Choose <b>Custom</b> and pick exactly the features a customer needs &mdash; no plan required.</p>
+
+    <div class="matrix-wrap rv"><div class="tbl-scroll"><table aria-label="Feature comparison">
+      <thead><tr><th>Compare features</th><th>Basic</th><th>Standard</th><th>Premium</th></tr></thead>
+      <tbody id="matrix"></tbody>
+    </table></div></div>
+  </div>
+</section>
+
+<!-- ============ SECURITY ============ -->
+<section style="background:#fff">
+  <div class="wrap">
+    <div class="head center"><span class="eyebrow rv">Trust &amp; safety</span><h2 class="rv d1">Built carefully, so you<br>can sleep at night.</h2></div>
+    <div class="sec-grid">
+      <div class="sec rv"><svg class="icon"><use href="#i-lock"/></svg><h3>Protected accounts</h3><p>Passwords are stored hashed, sign-ins are rate-limited, and sessions use short-lived tokens that refresh safely.</p></div>
+      <div class="sec rv d1"><svg class="icon"><use href="#i-shield"/></svg><h3>Payments you can trust</h3><p>Prices and stock are always checked on the server, and every Razorpay payment is verified by signature before an order is marked paid.</p></div>
+      <div class="sec rv d2"><svg class="icon"><use href="#i-users"/></svg><h3>Shops stay separate</h3><p>Data isolation is enforced automatically on every query, and a customer&rsquo;s login only works in the shop that issued it.</p></div>
+      <div class="sec rv d3"><svg class="icon"><use href="#i-server"/></svg><h3>Yours to host</h3><p>Ships with Docker files and a Postgres setup so you can run it on your own server and keep full control of your data.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ FAQ ============ -->
+<section id="faq">
+  <div class="wrap">
+    <div class="head center"><span class="eyebrow rv">Questions</span><h2 class="rv d1">Everything you&rsquo;re wondering.</h2></div>
+    <div class="faq rv">
+      <details><summary>Does the money go to my account?</summary><p>Yes. Each shop connects its own Razorpay account, so customer payments are settled directly to that business&rsquo;s bank account. Razorpay completes the business verification (KYC) for each account.</p></details>
+      <details><summary>Can every customer use their own domain and logo?</summary><p>Yes. A shop can run on its own domain (for example shop.theirbrand.com), and its admin can change the name, upload a logo and pick brand colours at any time.</p></details>
+      <details><summary>Can I change a customer&rsquo;s features later?</summary><p>Anytime. Flip a feature on or off, or move a shop to a different plan, and it takes effect immediately. Switched-off features are hidden in the shop and blocked on the server.</p></details>
+      <details><summary>Which products and business types work?</summary><p>Fashion, electronics, home &amp; kitchen, beauty, grocery, books, toys, sports, jewellery, pets, automotive, gifts, handicrafts and tools &mdash; and you can add your own categories. Regulated goods such as prescription medicines or alcohol need their own licences and checks, so talk to us first.</p></details>
+      <details><summary>Is there a mobile app?</summary><p>The storefront is mobile-first and works beautifully in any phone browser, with a bottom navigation bar like an app. A native iOS/Android app isn&rsquo;t included today.</p></details>
+      <details><summary>How is it hosted and delivered?</summary><p>It is a standard web application (React and Python FastAPI) that ships with Docker files. You can host it on your own server or cloud account, so your data stays under your control.</p></details>
+      <details><summary>Can customers pay with UPI apps like Google Pay and PhonePe?</summary><p>Yes &mdash; UPI, cards, net banking and wallets are offered through Razorpay once the shop&rsquo;s Razorpay account has UPI enabled. Cash on delivery is available as a separate option.</p></details>
+    </div>
+  </div>
+</section>
+
+<!-- ============ FINAL CTA ============ -->
+<section class="final" id="contact">
+  <div class="wrap">
+    <span class="eyebrow">Contact us</span>
+    <h2>Your customers are<br><span class="grad-text">already shopping online.</span></h2>
+    <p class="sub">Let&rsquo;s get your business in front of them. Talk to our CEO and we&rsquo;ll show you your own branded shop &mdash; live.</p>
+    <div class="cta-row">
+      <a class="btn btn-primary btn-lg" href="#message"><svg class="icon"><use href="#i-send"/></svg> Send a message</a>
+      <a class="btn btn-ghost btn-lg" id="ctaWa" href="#" target="_blank" rel="noopener"><svg class="icon"><use href="#i-chat"/></svg> Chat on WhatsApp</a>
+      <a class="btn btn-ghost btn-lg" id="ctaCall" href="#"><svg class="icon"><use href="#i-call"/></svg> Call +91 88018 85124</a>
+    </div>
+    <p class="small-print">Or email <a id="ctaMail" href="#" style="text-decoration:underline">odapallyvinod@gmail.com</a> &bull; See it live: <a id="demoFashion" href="#" target="_blank" rel="noopener" style="text-decoration:underline">fashion store demo</a> &bull; <a id="demoTech" href="#" target="_blank" rel="noopener" style="text-decoration:underline">electronics store demo</a></p>
+  </div>
+</section>
+
+<section class="cbody" aria-label="Contact details and message form">
+  <div class="wrap cgrid">
+    <article class="ccard">
+      <div class="ceo"><span class="av" aria-hidden="true">VO</span><div><h3>Vinod Odapally</h3><span class="role">CEO</span></div></div>
+      <p class="intro">Talk to our CEO directly &mdash; tell us about your business and we&rsquo;ll help you get online and start selling.</p>
+      <div class="ways">
+        <div class="way"><span class="ic c1"><svg class="icon"><use href="#i-call"/></svg></span>
+          <div class="t"><small>Phone</small><b>+91 88018 85124</b></div>
+          <div class="acts"><button class="copy" type="button" data-copy="+91 88018 85124" aria-label="Copy phone number"><svg class="icon" style="width:18px;height:18px"><use href="#i-copy"/></svg></button><a class="btn btn-line btn-sm" id="wayCall" href="#">Call</a></div></div>
+        <div class="way"><span class="ic c2"><svg class="icon"><use href="#i-chat"/></svg></span>
+          <div class="t"><small>WhatsApp</small><b>+91 88018 85124</b></div>
+          <div class="acts"><a class="btn btn-wa btn-sm" id="wayWa" href="#" target="_blank" rel="noopener">Chat</a></div></div>
+        <div class="way"><span class="ic c3"><svg class="icon"><use href="#i-mail"/></svg></span>
+          <div class="t"><small>Email</small><b>odapallyvinod@gmail.com</b></div>
+          <div class="acts"><button class="copy" type="button" data-copy="odapallyvinod@gmail.com" aria-label="Copy email address"><svg class="icon" style="width:18px;height:18px"><use href="#i-copy"/></svg></button><a class="btn btn-line btn-sm" id="wayMail" href="#">Email</a></div></div>
+      </div>
+      <div class="save"><button class="btn btn-line" type="button" id="vcf"><svg class="icon"><use href="#i-user"/></svg> Save contact to phone</button><small>Adds Vinod to your contacts (.vcf)</small></div>
+    </article>
+
+    <article class="ccard" id="message">
+      <h3 class="ft">Send us a message</h3>
+      <p class="csub">Share a few details and choose how to send it &mdash; by email or WhatsApp. It opens ready to send.</p>
+      <form class="cform" id="contactForm" novalidate>
+        <div class="f"><label for="name">Your name <i>*</i></label><input id="name" autocomplete="name" placeholder="Priya Sharma"><span class="err" id="eName"></span></div>
+        <div class="f"><label for="phone">Phone / WhatsApp</label><input id="phone" type="tel" autocomplete="tel" placeholder="98765 43210"></div>
+        <div class="f"><label for="email">Email</label><input id="email" type="email" autocomplete="email" placeholder="you@business.com"><span class="err" id="eEmail"></span></div>
+        <div class="f"><label for="biz">Business name</label><input id="biz" autocomplete="organization" placeholder="FashionHub"></div>
+        <div class="f"><label for="sell">What do you sell?</label>
+          <select id="sell"><option value="">Choose a category</option><option>Fashion</option><option>Electronics</option><option>Home &amp; Kitchen</option><option>Beauty &amp; Personal Care</option><option>Grocery &amp; Gourmet</option><option>Books &amp; Stationery</option><option>Toys, Kids &amp; Baby</option><option>Sports &amp; Fitness</option><option>Jewellery &amp; Watches</option><option>Health &amp; Wellness</option><option>Pet Supplies</option><option>Automotive</option><option>Gifts &amp; Party</option><option>Handicrafts &amp; Art</option><option>Tools &amp; Hardware</option><option>Something else</option></select></div>
+        <div class="f"><label for="plan">Plan you&rsquo;re interested in</label>
+          <select id="plan"><option value="">Not sure yet</option><option>Basic</option><option>Standard</option><option>Premium</option><option>Custom</option></select></div>
+        <div class="f full"><label for="msg">Message</label><textarea id="msg" placeholder="Tell us about your business and what you need…"></textarea></div>
+        <div class="f full"><span class="err" id="eForm"></span></div>
+        <div class="send">
+          <button class="btn btn-primary" type="submit"><svg class="icon"><use href="#i-send"/></svg> Send by email</button>
+          <button class="btn btn-wa" type="button" id="sendWa"><svg class="icon"><use href="#i-chat"/></svg> Send on WhatsApp</button>
+          <button class="btn btn-line" type="button" id="copyMsg"><svg class="icon"><use href="#i-copy"/></svg> Copy message</button>
+        </div>
+        <p class="fnote">Your message goes straight to our CEO&rsquo;s email or WhatsApp &mdash; nothing is stored on this page.</p>
+      </form>
+    </article>
+  </div>
+</section>
+</main>
+
+<footer><div class="wrap foot">
+  <div class="brand" style="color:#fff;font-size:1.05rem"><span class="mark" style="width:30px;height:30px;border-radius:9px"><svg style="width:17px;height:17px"><use href="#i-bag"/></svg></span><span data-brand>StyleKart</span></div>
+  <nav><a href="#features">Features</a><a href="#playground">Live demo</a><a href="#plans">Plans</a><a href="#faq">FAQ</a><a href="#contact">Contact</a></nav>
+  <div>&copy; <span id="yr"></span> <span data-brand>StyleKart</span>. All rights reserved.</div>
+</div></footer>
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script>
+/* =====================================================================
+   EDIT THESE: your brand, contact details and (optionally) prices.
+   ===================================================================== */
+const CONFIG = {
+  brand: "StyleKart",                       // your platform / company name
+  ceo: "Vinod Odapally", ceoTitle: "CEO",
+  email: "odapallyvinod@gmail.com",         // where demo requests are sent
+  phone: "+918801885124",                   // used for the Call button
+  phoneDisplay: "+91 88018 85124",
+  whatsapp: "918801885124",                 // country code + number, digits only
+  fashionDemo: "http://localhost:8000/?shop=default",   // replace with your public demo links
+  techDemo:    "http://localhost:8000/?shop=techmart",
+  // Prices: put text such as "₹4,999" to show a price; leave null to show "Custom quote".
+  prices: { basic: null, standard: null, premium: null },
+  priceNote: "per shop / month"
+};
+
+/* ---- plan & feature definitions (mirrors what the platform really offers) ---- */
+const FEATURES = [
+  { key:"online_payments", label:"Online payments (UPI, cards…)", group:"Payments" },
+  { key:"cod",             label:"Cash on delivery",              group:"Payments" },
+  { key:"coupons",         label:"Coupons & discount codes",      group:"Marketing" },
+  { key:"stock_alerts",    label:"Back-in-stock alerts",          group:"Marketing" },
+  { key:"social_share",    label:"Social sharing",                group:"Marketing" },
+  { key:"wishlist",        label:"Wishlist",                      group:"Shopping" },
+  { key:"reviews",         label:"Ratings & reviews",             group:"Shopping" },
+  { key:"guest_cart",      label:"Guest shopping bag",            group:"Shopping" },
+  { key:"multi_address",   label:"Multiple saved addresses",      group:"Shopping" }
+];
+const PLANS = {
+  basic:    { name:"Basic",    tag:"Everything you need to take orders and get paid.", features:["online_payments","cod"] },
+  standard: { name:"Standard", tag:"Convenience features that turn browsers into buyers.", features:["online_payments","cod","coupons","wishlist","reviews","guest_cart","multi_address"] },
+  premium:  { name:"Premium",  tag:"The full growth toolkit — alerts, sharing and more.", features:FEATURES.map(f=>f.key) }
+};
+const ALWAYS = [
+  "Mobile-first storefront", "Category catalogue with variants & specs", "Search & filters",
+  "Admin dashboard, orders & refunds", "Your logo, colours & shop name", "Your own domain & Razorpay account"
+];
+const CATEGORIES = [
+  ["👗","Fashion","Size"],["📱","Electronics","Variant"],["🏠","Home & Kitchen","Option"],["💄","Beauty & Personal Care","Pack size"],
+  ["🛒","Grocery & Gourmet","Pack size"],["📚","Books & Stationery","Format"],["🧸","Toys, Kids & Baby","Option"],["🏋️","Sports & Fitness","Size"],
+  ["💍","Jewellery & Watches","Size"],["💊","Health & Wellness","Pack size"],["🐾","Pet Supplies","Pack size"],["🚗","Automotive","Option"],
+  ["🎁","Gifts & Party","Option"],["🎨","Handicrafts & Art","Option"],["🛠️","Tools & Hardware","Option"]
+];
+
+const $ = (s, r=document) => r.querySelector(s);
+const $$ = (s, r=document) => [...r.querySelectorAll(s)];
+const icon = n => `<svg class="icon"><use href="#i-${n}"/></svg>`;
+
+/* ---- brand & contact ---- */
+$$("[data-brand]").forEach(e => e.textContent = CONFIG.brand);
+document.title = `${CONFIG.brand} — launch your online store in days, not months`;
+$("#yr").textContent = new Date().getFullYear();
+const subject = encodeURIComponent(`Demo request - ${CONFIG.brand}`);
+const body = encodeURIComponent("Hi, I'd like a demo.\n\nName:\nBusiness:\nWhat I sell:\nPhone:");
+$("#ctaMail").href = `mailto:${CONFIG.email}?subject=${subject}&body=${body}`;
+$("#ctaCall").href = `tel:${CONFIG.phone}`;
+document.addEventListener("click", e => {      // plan buttons (created later) pre-select the plan in the contact form
+  const a = e.target.closest && e.target.closest("[data-plan-pick]"); if (!a) return;
+  const o = [...$("#plan").options].find(x => x.text === a.dataset.planPick); if (o) $("#plan").value = o.value || o.text;
+});
+$("#ctaWa").href = `https://wa.me/${CONFIG.whatsapp}?text=${encodeURIComponent("Hi! I'd like a demo of your store platform.")}`;
+$("#demoFashion").href = CONFIG.fashionDemo; $("#demoTech").href = CONFIG.techDemo;
+
+/* ---- categories wall ---- */
+$("#catWall").innerHTML = CATEGORIES.map(([e,n,v],i) =>
+  `<div class="cat rv d${i%3}"><span class="e">${e}</span><div><b>${n}</b><small>Choose by: ${v}</small></div></div>`).join("");
+
+/* ---- plan cards ---- */
+const planCard = (k, pop) => {
+  const p = PLANS[k], price = CONFIG.prices[k];
+  const lis = FEATURES.map(f => `<li class="${p.features.includes(f.key) ? "" : "no"}">${icon(p.features.includes(f.key) ? "check" : "x")}${f.label}</li>`).join("");
+  return `<article class="plan ${pop ? "pop" : ""} rv">
+    ${pop ? '<span class="ribbon">MOST POPULAR</span>' : ""}
+    <h3>${p.name}</h3><p class="tagline">${p.tag}</p>
+    <div class="price ${price ? "" : "q"}">${price ? `${price} <small>${CONFIG.priceNote}</small>` : "Custom quote"}</div>
+    <ul>${ALWAYS.slice(0,3).map(a => `<li>${icon("check")}${a}</li>`).join("")}${lis}</ul>
+    <a class="btn ${pop ? "btn-primary" : "btn-dark"}" href="#contact" data-plan-pick="${p.name}">Get ${p.name}</a>
+  </article>`;
+};
+$("#plansGrid").innerHTML = planCard("basic") + planCard("standard", true) + planCard("premium");
+
+/* ---- comparison matrix ---- */
+let rows = `<tr class="grp"><td colspan="4">Included in every plan</td></tr>` +
+  ALWAYS.map(a => `<tr><td>${a}</td>${`<td><span class="y">${icon("check")}</span></td>`.repeat(3)}</tr>`).join("");
+[...new Set(FEATURES.map(f => f.group))].forEach(g => {
+  rows += `<tr class="grp"><td colspan="4">${g}</td></tr>`;
+  FEATURES.filter(f => f.group === g).forEach(f => {
+    rows += `<tr><td>${f.label}</td>` + ["basic","standard","premium"].map(k =>
+      `<td>${PLANS[k].features.includes(f.key) ? `<span class="y">${icon("check")}</span>` : `<span class="n">${icon("x")}</span>`}</td>`).join("") + `</tr>`;
+  });
+});
+$("#matrix").innerHTML = rows;
+
+/* ---- interactive switches ---- */
+const state = Object.fromEntries(FEATURES.map(f => [f.key, true]));
+$("#switches").innerHTML = FEATURES.map(f =>
+  `<label class="sw"><span>${f.label}</span><input type="checkbox" data-k="${f.key}" checked><span class="tg"></span></label>`).join("");
+
+function applyState() {
+  $$("[data-feat]").forEach(el => el.classList.toggle("feat-hide", !state[el.dataset.feat]));
+  $$("[data-nofeat]").forEach(el => el.classList.toggle("feat-hide", !!state[el.dataset.nofeat]));
+  $$("#switches input").forEach(i => i.checked = !!state[i.dataset.k]);
+  const online = state.online_payments, cod = state.cod;
+  const cta = $("#cta");
+  cta.classList.toggle("off", !online && !cod);
+  cta.textContent = (!online && !cod) ? "No payment method enabled" : (online ? "Pay ₹1,599" : "Place order");
+  $$(".m-pay div").forEach(d => d.classList.remove("on"));
+  const first = $(".m-pay div:not(.feat-hide)"); if (first) first.classList.add("on");
+}
+$("#switches").addEventListener("change", e => {
+  if (!e.target.dataset.k) return;
+  state[e.target.dataset.k] = e.target.checked;
+  $$(".plan-tabs button").forEach(b => b.setAttribute("aria-pressed", "false"));
+  applyState();
+});
+$$(".plan-tabs button").forEach(b => b.addEventListener("click", () => {
+  Object.keys(state).forEach(k => state[k] = PLANS[b.dataset.plan].features.includes(k));
+  $$(".plan-tabs button").forEach(x => x.setAttribute("aria-pressed", String(x === b)));
+  applyState();
+}));
+$$(".theme-row button").forEach(b => b.addEventListener("click", () => {
+  const [a, c] = b.dataset.c.split(",");
+  const s = $("#screen").style; s.setProperty("--pink", a); s.setProperty("--purple", c);
+  $(".m-addr").style.borderColor = a;
+}));
+const names = ["FashionHub", "TechMart", "FreshBasket", "HomeNest", "GiftBox"];
+let ni = 0; $("[data-shopname]").textContent = names[0];
+setInterval(() => { ni = (ni + 1) % names.length; $("[data-shopname]").textContent = names[ni]; }, 2600);
+applyState();
+// changing the PAGE theme resets the demo shop to follow it again
+document.addEventListener("themechange", () => {
+  const sc = $("#screen").style; sc.removeProperty("--pink"); sc.removeProperty("--purple"); $(".m-addr").style.borderColor = "";
+});
+
+/* ---- nav background ---- */
+const nav = $("#nav");
+const onScroll = () => nav.classList.toggle("solid", scrollY > 30);
+addEventListener("scroll", onScroll, { passive: true }); onScroll();
+
+/* ---- scroll reveal ---- */
+const io = "IntersectionObserver" in window ? new IntersectionObserver((es, o) => es.forEach(e => { if (e.isIntersecting) { e.target.classList.add("in"); o.unobserve(e.target); } }), { threshold: .12 }) : null;
+$$(".rv").forEach(el => io ? io.observe(el) : el.classList.add("in"));
+
+/* ---- counters ---- */
+const cio = "IntersectionObserver" in window ? new IntersectionObserver((es, o) => es.forEach(e => {
+  if (!e.isIntersecting) return; o.unobserve(e.target);
+  const el = e.target, to = +el.dataset.count, suf = el.dataset.suffix || "", t0 = performance.now(), dur = 1400;
+  const tick = t => { const p = Math.min(1, (t - t0) / dur), v = Math.round(to * (1 - Math.pow(1 - p, 3))); el.textContent = v + suf; if (p < 1) requestAnimationFrame(tick); };
+  requestAnimationFrame(tick);
+}), { threshold: .6 }) : null;
+$$("[data-count]").forEach(el => cio ? cio.observe(el) : (el.textContent = el.dataset.count + (el.dataset.suffix || "")));
+
+/* ---- contact section: copy buttons, save-contact card, message form ---- */
+(function () {
+  const C = { brand: CONFIG.brand, name: CONFIG.ceo, title: CONFIG.ceoTitle, phone: CONFIG.phone, whatsapp: CONFIG.whatsapp, email: CONFIG.email };
+  const toastEl = $("#toast"); let toastTimer;
+  const toast = msg => { toastEl.textContent = msg; toastEl.classList.add("show"); clearTimeout(toastTimer); toastTimer = setTimeout(() => toastEl.classList.remove("show"), 2600); };
+  const hello = encodeURIComponent(`Hi ${C.name}, I'd like to know more about ${C.brand}.`);
+  $("#wayCall").href = `tel:${C.phone}`;
+  $("#wayWa").href = `https://wa.me/${C.whatsapp}?text=${hello}`;
+  $("#wayMail").href = `mailto:${C.email}?subject=${encodeURIComponent("Enquiry - " + C.brand)}`;
+
+  async function copyText(text) {
+    try { await navigator.clipboard.writeText(text); return true; }
+    catch {
+      const t = document.createElement("textarea"); t.value = text; t.style.cssText = "position:fixed;opacity:0";
+      document.body.appendChild(t); t.select(); let ok = false;
+      try { ok = document.execCommand("copy"); } catch { /* ignore */ }
+      t.remove(); return ok;
+    }
+  }
+  $$("[data-copy]").forEach(b => b.addEventListener("click", async () => toast(await copyText(b.dataset.copy) ? `Copied ${b.dataset.copy}` : "Could not copy - please select and copy manually")));
+
+  $("#vcf").addEventListener("click", () => {
+    const [first, ...rest] = C.name.split(" ");
+    const v = ["BEGIN:VCARD", "VERSION:3.0", `FN:${C.name}`, `N:${rest.join(" ")};${first};;;`, `TITLE:${C.title}`, `ORG:${C.brand}`,
+      `TEL;TYPE=CELL,VOICE:${C.phone}`, `EMAIL;TYPE=INTERNET:${C.email}`, "END:VCARD"].join("\r\n");
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(new Blob([v], { type: "text/vcard" }));
+    a.download = `${C.name.toLowerCase().replace(/\s+/g, "-")}.vcf`;
+    document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+    toast("Contact card downloaded");
+  });
+
+  const f = id => $("#" + id);
+  try { const p = new URLSearchParams(location.search).get("plan"); if (p) { const o = [...f("plan").options].find(x => x.text.toLowerCase() === p.toLowerCase()); if (o) f("plan").value = o.value || o.text; } } catch { /* ignore */ }
+
+  window.buildContactMessage = function () {
+    const v = id => f(id).value.trim();
+    const lines = [`Hi ${C.name},`, "", `I'd like to know more about ${C.brand}.`, "", `Name: ${v("name")}`];
+    if (v("phone")) lines.push(`Phone: ${v("phone")}`);
+    if (v("email")) lines.push(`Email: ${v("email")}`);
+    if (v("biz")) lines.push(`Business: ${v("biz")}`);
+    if (v("sell")) lines.push(`I sell: ${v("sell")}`);
+    if (v("plan")) lines.push(`Interested in: ${v("plan")} plan`);
+    if (v("msg")) lines.push("", v("msg"));
+    return lines.join("\n");
+  };
+  function validate() {
+    let ok = true;
+    const name = f("name").value.trim(), phone = f("phone").value.trim(), email = f("email").value.trim();
+    f("eName").textContent = f("eEmail").textContent = f("eForm").textContent = "";
+    [f("name"), f("email")].forEach(x => x.classList.remove("bad"));
+    if (name.length < 2) { f("eName").textContent = "Please enter your name."; f("name").classList.add("bad"); ok = false; }
+    if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email)) { f("eEmail").textContent = "That email doesn't look right."; f("email").classList.add("bad"); ok = false; }
+    if (ok && !phone && !email) { f("eForm").textContent = "Please add a phone number or an email so we can reply."; ok = false; }
+    if (!ok) (document.querySelector(".cform .bad") || f("phone")).focus();
+    return ok;
+  }
+  f("contactForm").addEventListener("submit", e => {
+    e.preventDefault();
+    if (!validate()) return;
+    location.href = `mailto:${C.email}?subject=${encodeURIComponent(`Enquiry from ${f("name").value.trim()} - ${C.brand}`)}&body=${encodeURIComponent(window.buildContactMessage())}`;
+    toast("Opening your email app…");
+  });
+  f("sendWa").addEventListener("click", () => {
+    if (!validate()) return;
+    window.open(`https://wa.me/${C.whatsapp}?text=${encodeURIComponent(window.buildContactMessage())}`, "_blank", "noopener");
+    toast("Opening WhatsApp…");
+  });
+  f("copyMsg").addEventListener("click", async () => {
+    if (!validate()) return;
+    toast(await copyText(window.buildContactMessage()) ? "Message copied - paste it anywhere" : "Could not copy the message");
+  });
+})();
+</script>
+</body>
+</html>
